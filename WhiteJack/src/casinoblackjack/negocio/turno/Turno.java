@@ -5,10 +5,16 @@
  */
 package casinoblackjack.negocio.turno;
 
+import casinoblackjack.negocio.jugador.Jugador;
+
 /**
  *
  * @author Krnx
  */
 public class Turno {
+
+    public Jugador nextTurn() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

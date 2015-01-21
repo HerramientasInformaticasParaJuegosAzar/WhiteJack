@@ -5,10 +5,13 @@
  */
 package casinoblackjack.negocio.jugador.imp;
 
+import casinoblackjack.negocio.cartas.Carta;
+import java.util.ArrayList;
+
 /**
  *
  * @author Krnx
  */
 public class JugadorImp {
-    
+    ArrayList<Carta> cartas;
 }

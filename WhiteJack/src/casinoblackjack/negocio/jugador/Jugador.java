@@ -5,11 +5,19 @@
  */
 package casinoblackjack.negocio.jugador;
 
+import casinoblackjack.negocio.cartas.Carta;
+import casinoblackjack.negocio.cartas.Decision;
+import casinoblackjack.negocio.mesa.Mesa;
+import java.util.ArrayList;
+
 /**
  *
  * @author Krnx
  */
-public class Jugador 
+public interface Jugador 
 {
+    public void addCarta(Carta carta);
+    public ArrayList<Carta> getCartas();
+    public Decision makeDecision(Mesa mesa);
     
 }

@@ -5,11 +5,22 @@
  */
 package casinoblackjack.negocio.jugador;
 
+import casinoblackjack.negocio.cartas.Carta;
+
 /**
  *
  * @author Krnx
  */
-public class Jugador 
+public abstract class Jugador 
 {
+    private String user;
+    private String pass;
+    private int cantidadApuesta;
     
+    
+    public abstract Decision juegoTurno(Carta[] cartasMesa, Decision posiblesDecisiones);
+    // Decision juegaTurno(Cartas....)
+    
+    // atributos: user, pass, cantidadApuesta
+    //jugador.getCAntida
 }

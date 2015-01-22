@@ -9,6 +9,7 @@ package casinoblackjack.negocio.turno;
  *
  * @author Krnx
  */
-public class Turno {
-    
+public class Turno 
+{
+    // partida, turno, jugador, resultado
 }

@@ -10,5 +10,5 @@ package casinoblackjack.integracion.DAO.turno;
  */
 public interface DAOTurno 
 {
-	
+	// Alta, baja, modificar, mostrar, eliminar
 }

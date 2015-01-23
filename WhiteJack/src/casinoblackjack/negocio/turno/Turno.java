@@ -11,10 +11,35 @@ import casinoblackjack.negocio.jugador.Jugador;
  *
  * @author Krnx
  */
-public class Turno {
+public class Turno 
+{
+    int idTurno;
+    int idJugador;
+    double resultado;
 
-    public Jugador nextTurn() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public int getIdTurno() {
+        return idTurno;
     }
+
+    public void setIdTurno(int idTurno) {
+        this.idTurno = idTurno;
+    }
+
+    public int getIdJugador() {
+        return idJugador;
+    }
+
+    public void setIdJugador(int idJugador) {
+        this.idJugador = idJugador;
+    }
+
+    public double getResultado() {
+        return resultado;
+    }
+
+    public void setResultado(double resultado) {
+        this.resultado = resultado;
+    }
+    
     
 }

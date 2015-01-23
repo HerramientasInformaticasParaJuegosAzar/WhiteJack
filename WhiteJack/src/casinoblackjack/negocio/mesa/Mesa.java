@@ -34,9 +34,7 @@ public class Mesa
         this.jugadores.add(jugador);
     }
     
-    public Jugador nextTurn(){
-        return turno.nextTurn();
-    }
+    
     
     public ArrayList<Carta> getCartasEnMesa(){
         ArrayList<Carta> cartas = new ArrayList<Carta>();

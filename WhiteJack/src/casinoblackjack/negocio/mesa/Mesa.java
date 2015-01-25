@@ -5,10 +5,12 @@
  */
 package casinoblackjack.negocio.mesa;
 
+import casinoblackjack.negocio.banca.SABanca;
 import casinoblackjack.negocio.cartas.Carta;
+import casinoblackjack.negocio.cartas.Decision;
 import casinoblackjack.negocio.cartas.barajeador.Barajeador;
 import casinoblackjack.negocio.dealer.Dealer;
-import casinoblackjack.negocio.jugador.Jugador;
+import casinoblackjack.negocio.jugador.SA.SAJugador;
 import casinoblackjack.negocio.turno.Turno;
 import java.util.ArrayList;
 
@@ -16,29 +18,28 @@ import java.util.ArrayList;
  *
  * @author Krnx
  */
-public class Mesa 
-{
+public class Mesa {
+
     private int id;
     private Dealer dealer;
-    private ArrayList<Jugador> jugadores;
+    private ArrayList<SAJugador> jugadores;
     private Barajeador baraja;
     private Turno turno;
-    
-    
-    public Mesa(int barajas){
+    private SABanca banca;
+    private ArrayList<Integer> apuestas;
+
+    public Mesa(int barajas) {
         this.dealer = new Dealer();
         this.baraja = new Barajeador(barajas);
     }
-    
-    public void addPlayer(Jugador jugador){
+
+    public void addPlayer(SAJugador jugador) {
         this.jugadores.add(jugador);
     }
-    
-    
-    
-    public ArrayList<Carta> getCartasEnMesa(){
+
+    public ArrayList<Carta> getCartasEnMesa() {
         ArrayList<Carta> cartas = new ArrayList<Carta>();
-        for(Jugador jugador:jugadores){
+        for (SAJugador jugador : jugadores) {
             cartas.addAll(jugador.getCartas());
         }
         cartas.addAll(this.dealer.getCartas());
@@ -179,8 +180,38 @@ public class Mesa
             jugador.addCarta(this.baraja.obtenerCarta(), esSplit);
         }
     }
-    
-    
-    
-    
+
+    /*   jugadorSplit(SAJugador jugador)
+     *
+     *   comprueba que puede hacer split y que puede doblar la apuesta
+     */
+    private void jugadorSplit(SAJugador jugador) {
+        if (puedeApostar(jugador)) {
+            if (puedeHacerSplit(jugador)) {
+                this.jugarTurno(jugador, false, 0);
+                this.jugarTurno(jugador, false, 1);
+            }
+        }
+    }
+
+    private boolean puedeHacerSplit(SAJugador jugador) {
+        ArrayList<Carta> cartas = jugador.getCartas();
+        if(cartas.size()!=2)return false;
+        return (cartas.get(0)==cartas.get(1));
+    }
+
+    private void repartirCartas() {
+        for (SAJugador jugador : jugadores) {
+            jugador.addCarta(this.baraja.obtenerCarta());
+            jugador.addCarta(this.baraja.obtenerCarta());
+        }
+        dealer.addCarta(this.baraja.obtenerCarta());
+    }
+
+    private void jugarTurno() {
+        recogerApuestas();
+        repartirCartas();
+        preguntarDecisiones();
+    }
+
 }

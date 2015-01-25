@@ -5,6 +5,8 @@
  */
 package casinoblackjack.negocio.banca;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Krnx
@@ -17,4 +19,5 @@ public interface SABanca
     public boolean incrementarSaldo(double incremento);
     public boolean decrementarSaldo(double decremento);
     public boolean bajaCuenta(int idCuenta);
+    public ArrayList<Integer> getCuentasJugador(int idJugador);
 }

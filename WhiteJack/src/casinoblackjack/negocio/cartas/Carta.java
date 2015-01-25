@@ -23,9 +23,11 @@ public class Carta
         this.palo = palo;
     }
 
-    public Valor getValor() 
+    public int getValor() 
     {
-        return valor;
+        if(this.valor.ordinal()==1) return 11;
+        if(this.valor.ordinal()>10) return 10;
+        return this.valor.ordinal();
     }
 
     public void setValor(Valor valor) 

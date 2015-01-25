@@ -20,7 +20,6 @@ package casinoblackjack.negocio.jugador.SA;
 import casinoblackjack.negocio.cartas.Carta;
 import casinoblackjack.negocio.cartas.Decision;
 import casinoblackjack.negocio.jugador.Jugador;
-import casinoblackjack.negocio.mesa.Mesa;
 import java.util.ArrayList;
 
 /**
@@ -36,5 +35,11 @@ public interface SAJugador
     
     public abstract void addCarta(Carta carta);
     public abstract ArrayList<Carta> getCartas();
-    public abstract Decision makeDecision(Mesa mesa);
+    public abstract int getIDJugador();
+
+    public abstract int apostar();
+
+    public abstract Decision makeDecision(Carta cartaDealer, ArrayList<Carta> cartasEnMesa);
+
+    public abstract void addCarta(Carta carta, int esSplit);
 }

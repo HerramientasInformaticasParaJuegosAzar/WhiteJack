@@ -39,6 +39,9 @@ import javax.persistence.criteria.Root;
  * @author usuario_local
  */
 public class SAJugadorImp implements SAJugador {
+    
+    private ArrayList<Carta> cartas;
+    private ArrayList<Carta> cartasSplit;
 
     public SAJugadorImp(EntityManagerFactory emf) {
         this.emf = emf;
@@ -179,21 +182,24 @@ public class SAJugadorImp implements SAJugador {
     @Override
     public void addCarta(Carta carta) 
     {
+        this.cartas.add(carta);
+    }
+
+    @Override
+    public ArrayList<Carta> getCartas() 
+    {
+        return this.cartas;
+    }
+
+    @Override
+    public int getIDJugador() 
+    {
+        
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public ArrayList<Carta> getCartas() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public int getIDJugador() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public int apostar() {
+    public int apostar(int apuestaMin, int apuestaMax) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

@@ -8,6 +8,7 @@ package casinoblackjack.negocio.banca.imp;
 import casinoblackjack.integracion.DAO.factoriaDAO.FactoriaDAO;
 import casinoblackjack.integracion.transaction.transactionManager.TransactionManager;
 import casinoblackjack.negocio.banca.SABanca;
+import java.util.ArrayList;
 
 /**
  *
@@ -95,7 +96,7 @@ public class SABancaImp implements SABanca
     }
 
     @Override
-    public int altaCuenta(int idJugador) {
+    public ArrayList<Integer> getCuentasJugador(int idJugador) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

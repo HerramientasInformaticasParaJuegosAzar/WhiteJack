@@ -29,7 +29,7 @@ public class Mesa {
     private ArrayList<Integer> apuestas;
 
     public Mesa(int barajas) {
-        this.dealer = new Dealer();
+        this.dealer = new Dealer(null);
         this.baraja = new Barajeador(barajas);
     }
 
@@ -115,6 +115,7 @@ public class Mesa {
                 this.jugarTurno(jugadores.get(i), true, 0);
             }
         }
+        jugarTurno(dealer, true, 0);
     }
 
     /*   jugarTurno(SAJugador jugador)
@@ -194,12 +195,20 @@ public class Mesa {
         }
     }
 
+    /*   puedeHacerSplit(SAJugador jugador) 
+     *
+     *   comprueba que puede hacer split el jugador
+     */
     private boolean puedeHacerSplit(SAJugador jugador) {
         ArrayList<Carta> cartas = jugador.getCartas();
         if(cartas.size()!=2)return false;
         return (cartas.get(0)==cartas.get(1));
     }
 
+    /*   repartirCartas()
+     *
+     *   reparte dos cartas a cada jugador y una al dealer
+     */
     private void repartirCartas() {
         for (SAJugador jugador : jugadores) {
             jugador.addCarta(this.baraja.obtenerCarta());
@@ -207,11 +216,26 @@ public class Mesa {
         }
         dealer.addCarta(this.baraja.obtenerCarta());
     }
+    
+    /*   decidirGanador()
+     *
+     *   método para decidir ganador,
+     *   recorre los jugadores para ver quien gana y despues reparte el dinero
+     */
+    private void decidirGanador() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 
-    private void jugarTurno() {
+    /*   jugarTurno()
+     *
+     *   bucle del juego
+     */
+    public void jugarTurno() {
         recogerApuestas();
         repartirCartas();
         preguntarDecisiones();
+        decidirGanador();
     }
+
 
 }

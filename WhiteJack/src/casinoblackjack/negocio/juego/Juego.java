@@ -25,6 +25,16 @@ import casinoblackjack.negocio.mesa.Mesa;
 public class Juego {
     
     private Mesa mesa;
+   
+    public Juego(){
+        this.mesa = new Mesa(2);
+    }    
+    
+    public void Jugar(){
+        while (true) {            
+            mesa.jugarTurno();
+        }
+    }
     
     
     

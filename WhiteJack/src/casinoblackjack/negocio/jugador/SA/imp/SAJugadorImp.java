@@ -188,7 +188,22 @@ public class SAJugadorImp implements SAJugador {
     }
 
     @Override
-    public Decision makeDecision(Mesa mesa) {
+    public int getIDJugador() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public int apostar() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Decision makeDecision(Carta cartaDealer, ArrayList<Carta> cartasEnMesa) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void addCarta(Carta carta, int esSplit) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

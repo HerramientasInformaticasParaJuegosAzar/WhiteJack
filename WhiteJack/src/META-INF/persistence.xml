@@ -3,6 +3,8 @@
   <persistence-unit name="WhiteJackPU" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <class>casinoblackjack.negocio.jugador.Jugador</class>
+    <class>casinoblackjack.negocio.cuentas.Cuenta</class>
+    <class>casinoblackjack.negocio.turno.Turnos</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/blackjack"/>
       <property name="javax.persistence.jdbc.password" value=""/>

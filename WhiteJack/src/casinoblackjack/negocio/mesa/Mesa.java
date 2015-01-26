@@ -5,13 +5,13 @@
  */
 package casinoblackjack.negocio.mesa;
 
-import casinoblackjack.negocio.banca.SABanca;
+import casinoblackjack.negocio.cuentas.SA.SABanca;
 import casinoblackjack.negocio.cartas.Carta;
 import casinoblackjack.negocio.cartas.Decision;
 import casinoblackjack.negocio.cartas.barajeador.Barajeador;
 import casinoblackjack.negocio.dealer.Dealer;
 import casinoblackjack.negocio.jugador.SA.SAJugador;
-import casinoblackjack.negocio.turno.Turno;
+import casinoblackjack.negocio.turno.Turnos;
 import java.util.ArrayList;
 
 /**
@@ -24,12 +24,12 @@ public class Mesa {
     private Dealer dealer;
     private ArrayList<SAJugador> jugadores;
     private Barajeador baraja;
-    private Turno turno;
+    private Turnos turno;
     private SABanca banca;
     private ArrayList<Integer> apuestas;
 
     public Mesa(int barajas) {
-        this.dealer = new Dealer(null);
+        this.dealer = new Dealer();
         this.baraja = new Barajeador(barajas);
     }
 
@@ -53,7 +53,7 @@ public class Mesa {
      *       y luego comprueba si con alguna de ellas puede apostar.
      */
     private boolean puedeApostar(SAJugador jugador, int posibleApuesta) {
-        ArrayList<Integer> cuentas = banca.getCuentasJugador(jugador.getIDJugador());
+        ArrayList<Integer> cuentas = null;//banca.getCuentasJugador(jugador.getIDJugador());
         for (Integer numCuenta : cuentas) {
             if (this.banca.consultarSaldoCuenta(numCuenta) >= posibleApuesta) {
                 return true;
@@ -70,12 +70,13 @@ public class Mesa {
      *       para ello le pregunta a la banca por sus cuentas 
      *       y luego comprueba si con alguna de ellas puede apostar.
      */
+    
     private boolean puedeApostar(SAJugador jugador) {
         //busca la apuesta del jugador 
         int indexJugador = this.jugadores.indexOf((SAJugador) jugador);
         int posibleApuesta = this.apuestas.get(indexJugador);
 
-        ArrayList<Integer> cuentas = banca.getCuentasJugador(jugador.getIDJugador());
+        ArrayList<Integer> cuentas = null; //banca.getCuentasJugador(jugador.getIDJugador());
         for (Integer numCuenta : cuentas) {
             if (this.banca.consultarSaldoCuenta(numCuenta) >= posibleApuesta) {
                 this.apuestas.set(indexJugador, posibleApuesta * 2);
@@ -109,6 +110,7 @@ public class Mesa {
      *
      *   Pregunta a cada jugador por una decisión siempre que haya apostado algo.
      */
+    
     private void preguntarDecisiones() {
         for (int i = 0; i < jugadores.size(); i++) {
             if (this.apuestas.get(i) > 0) {
@@ -176,6 +178,7 @@ public class Mesa {
      *  si es split, se la añade al conjunto de cartas correspondiente
      *  luego deja de pedir cartas
      */
+    
     private void jugadorDouble(SAJugador jugador, int esSplit) {
         if (puedeApostar(jugador)) {
             jugador.addCarta(this.baraja.obtenerCarta(), esSplit);

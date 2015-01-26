@@ -17,123 +17,120 @@
 
 package casinoblackjack.negocio.jugador.SA.imp;
 
-import casinoblackjack.exceptions.NonexistentEntityException;
 import casinoblackjack.negocio.cartas.Carta;
 import casinoblackjack.negocio.cartas.Decision;
 import casinoblackjack.negocio.jugador.Jugador;
 import casinoblackjack.negocio.jugador.SA.SAJugador;
-import casinoblackjack.negocio.mesa.Mesa;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.LockModeType;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
+
 
 /**
  *
  * @author usuario_local
  */
-public class SAJugadorImp implements SAJugador {
-
-    public SAJugadorImp(EntityManagerFactory emf) {
-        this.emf = emf;
-    }
-    private EntityManagerFactory emf = null;
-
-    public EntityManager getEntityManager() {
-        return emf.createEntityManager();
-    }
-
+public class SAJugadorImp implements SAJugador 
+{
     @Override
-    public void altaJugador(Jugador jugador) 
+    public int altaJugador(Jugador jugador) 
     {
-        EntityManagerFactory ef = Persistence.createEntityManagerFactory("blackJackPU");
+        jugador.setIdjugadores(-1);
         
-        EntityManager em = ef.createEntityManager();
-        
-        try {
-            em = getEntityManager();
-            em.getTransaction().begin();
-            em.persist(jugador);
-            em.getTransaction().commit();
-        } finally {
-            if (em != null) {
-                em.close();
-            }
-            
-            if (ef != null)
-            {
-                ef.close();
-            }
-            
-        }
-    }
-
-    @Override
-    public void modificarJugador(Jugador jugador)
-    {
-        
-        EntityManagerFactory ef = Persistence.createEntityManagerFactory("blackJackPU");
-        EntityManager em = ef.createEntityManager();
-        
-        try {
-            em = getEntityManager();
-            em.getTransaction().begin();
-            jugador = em.merge(jugador);
-            em.getTransaction().commit();
-        } catch (Exception ex) 
+        EntityManager em = null;
+        EntityManagerFactory ef = null;
+        try 
         {
-            String msg = ex.getLocalizedMessage();
-            if (msg == null || msg.length() == 0) {
-                Integer id = jugador.getIdjugador();
-                
-                if (mostrarJugador(id) == null) 
+            ef = Persistence.createEntityManagerFactory("WhiteJackPU");
+            em = ef.createEntityManager();
+            
+            em.getTransaction().begin();
+            
+            Jugador jugadorAux = null;
+            
+            List results = em.createNamedQuery("Jugador.findByIdjugadores")
+            .setParameter("idjugadores", jugador.getIdjugadores())
+            .getResultList();
+            
+            if (results.size() > 0)
+                jugadorAux = (Jugador)results.get(0);
+            
+            if (jugadorAux != null)
+            {
+                if (!jugadorAux.getActivo())
                 {
-                    System.out.println("The jugador_1 with id " + id + " no longer exists.");
+                    jugadorAux.setActivo(true);
+                    em.merge(jugadorAux);
+                    jugador.setIdjugadores(jugadorAux.getIdjugadores());
+                    em.getTransaction().commit();
                 }
+                else
+                {
+                    System.out.println("Ya existe el jugador");
+                    em.getTransaction().rollback();
+                }
+            }            
+            else
+            {
+                em.persist(jugador);
+                em.getTransaction().commit();
             }
             
+           
         } 
         finally 
         {
-            if (em != null) {
-                em.close();
-            }
-            
+            if (em != null)             
+                em.close();           
             if (ef != null)
-            {
                 ef.close();
-            }
         }
+        
+        return jugador.getIdjugadores();
     }
 
     @Override
-    public void bajaJugador(Integer id)
+    public boolean modificarJugador(Jugador jugador)
     {
         
-        EntityManagerFactory ef = Persistence.createEntityManagerFactory("blackJackPU");
-        EntityManager em = ef.createEntityManager();
+        boolean correcto = true;
+        EntityManager em = null;
+        EntityManagerFactory ef =null;
+        try {
+           
+            ef= Persistence.createEntityManagerFactory("MerkaSoftPU");
+            em = ef.createEntityManager();
         
-        try 
-        {
-            em = getEntityManager();
             em.getTransaction().begin();
-            Jugador jugador = null;
-            try {
-                jugador = em.getReference(Jugador.class, id);
-                jugador.getIdjugador();
-            } catch (EntityNotFoundException enfe) 
+            Jugador d= em.find(Jugador.class, jugador.getIdjugadores(),LockModeType.OPTIMISTIC);
+            
+            if (d!=null)
             {
-                System.out.println("The jugador_1 with id " + id + " no longer exists.");
+                em.lock(d, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                
+                em.merge(jugador);
+                em.getTransaction().commit();
+                
             }
-            jugador.setActivo(false);
-            em.merge(jugador);
-            em.getTransaction().commit();
+          
+        } 
+        catch (Exception ex) 
+        {
+            correcto = false;
+            String msg = ex.getLocalizedMessage();
+            if (msg == null || msg.length() == 0) 
+            {
+                Integer id = jugador.getIdjugadores();
+                if (mostrarJugador(id) == null) 
+                {
+                    System.out.println("El jugador con id " + id + " no existe.");
+                }
+            }
+           
         } 
         finally 
         {
@@ -142,24 +139,58 @@ public class SAJugadorImp implements SAJugador {
                 em.close();
             }
             
-            if (ef != null)
-            {
-                ef.close();
+            if (ef!=null) ef.close();
+        }
+        return correcto;
+    }
+
+    @Override
+    public boolean bajaJugador(Integer id)
+    {
+        
+       EntityManager em = null;
+        boolean correcto = true;
+        try {
+            EntityManagerFactory ef = Persistence.createEntityManagerFactory("MerkaSoftPU");
+            em = ef.createEntityManager();
+            em.getTransaction().begin();
+            Jugador persistentJugador = em.find(Jugador.class, id);
+            
+            persistentJugador.setActivo(false); 
+            em.merge(persistentJugador);
+            em.getTransaction().commit();
+        } 
+        catch (Exception ex) 
+        {
+            correcto = false;
+            ex.printStackTrace();
+            
+        } finally {
+            if (em != null) {
+                em.close();
             }
         }
+        return correcto;
     }
 
     @Override
     public Jugador mostrarJugador(Integer id) 
     {
-        EntityManagerFactory ef = Persistence.createEntityManagerFactory("blackJackPU");
-        EntityManager em = ef.createEntityManager();
+        EntityManager em = null;
+        EntityManagerFactory ef = null;
+        
+        ef = Persistence.createEntityManagerFactory("WhiteJackPU");
+        em = ef.createEntityManager();
         
         Jugador jugador = null;
         try 
         {
             jugador = em.find(Jugador.class, id);
-        } 
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
         finally 
         {
             if (em != null) 

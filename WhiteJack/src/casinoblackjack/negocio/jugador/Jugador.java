@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 usuario_local
+ * Copyright (C) 2015 Krnx
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,11 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package casinoblackjack.negocio.jugador;
 
+import casinoblackjack.negocio.cuentas.Cuenta;
+import casinoblackjack.negocio.turno.Turnos;
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -26,61 +29,73 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author usuario_local
+ * @author Krnx
  */
 @Entity
-@Table(name = "jugador")
+@Table(name = "jugadores")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Jugador_1.findAll", query = "SELECT j FROM Jugador_1 j"),
-    @NamedQuery(name = "Jugador_1.findByIdjugador", query = "SELECT j FROM Jugador_1 j WHERE j.idjugador = :idjugador"),
-    @NamedQuery(name = "Jugador_1.findByUsuario", query = "SELECT j FROM Jugador_1 j WHERE j.usuario = :usuario"),
-    @NamedQuery(name = "Jugador_1.findByPassword", query = "SELECT j FROM Jugador_1 j WHERE j.password = :password"),
-    @NamedQuery(name = "Jugador_1.findByActivo", query = "SELECT j FROM Jugador_1 j WHERE j.activo = :activo")})
-
-public class Jugador
-{
+    @NamedQuery(name = "Jugador.findAll", query = "SELECT j FROM Jugador j"),
+    @NamedQuery(name = "Jugador.findByIdjugadores", query = "SELECT j FROM Jugador j WHERE j.idjugadores = :idjugadores"),
+    
+    @NamedQuery(name = "Jugador.findByPassword", query = "SELECT j FROM Jugador j WHERE j.password = :password"),
+    @NamedQuery(name = "Jugador.findByFechaRegistro", query = "SELECT j FROM Jugador j WHERE j.fechaRegistro = :fechaRegistro"),
+    @NamedQuery(name = "Jugador.findByActivo", query = "SELECT j FROM Jugador j WHERE j.activo = :activo")})
+public class Jugador implements Serializable {
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "jugador1")
+    private Turnos turnos;
+    @Basic(optional = false)
+    @Column(name = "activo")
+    private boolean activo;
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "jugador")
+    private Cuenta cuentas;
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "idjugador")
-    private Integer idjugador;
+    @Column(name = "idjugadores")
+    private Integer idjugadores;
     @Basic(optional = false)
     @Column(name = "usuario")
     private String usuario;
     @Basic(optional = false)
     @Column(name = "password")
     private String password;
-    @Basic(optional = false)
-    @Column(name = "activo")
-    private boolean activo;
+    @Basic(optional = true)
+    @Column(name = "fechaRegistro")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date fechaRegistro;
+    
 
     public Jugador() {
     }
 
-    public Jugador(Integer idjugador) {
-        this.idjugador = idjugador;
+    public Jugador(Integer idjugadores) {
+        this.idjugadores = idjugadores;
     }
 
-    public Jugador(Integer idjugador, String usuario, String password, boolean activo) {
-        this.idjugador = idjugador;
+    public Jugador(Integer idjugadores, String usuario, String password, Date fechaRegistro, boolean activo) {
+        this.idjugadores = idjugadores;
         this.usuario = usuario;
         this.password = password;
+        this.fechaRegistro = fechaRegistro;
         this.activo = activo;
     }
 
-    public Integer getIdjugador() {
-        return idjugador;
+    public Integer getIdjugadores() {
+        return idjugadores;
     }
 
-    public void setIdjugador(Integer idjugador) {
-        this.idjugador = idjugador;
+    public void setIdjugadores(Integer idjugadores) {
+        this.idjugadores = idjugadores;
     }
 
     public String getUsuario() {
@@ -99,6 +114,48 @@ public class Jugador
         this.password = password;
     }
 
+    public Date getFechaRegistro() {
+        return fechaRegistro;
+    }
+
+    public void setFechaRegistro(Date fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
+    }
+
+
+    public Cuenta getCuentas() {
+        return cuentas;
+    }
+
+    public void setCuentas(Cuenta cuentas) {
+        this.cuentas = cuentas;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (idjugadores != null ? idjugadores.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof Jugador)) {
+            return false;
+        }
+        Jugador other = (Jugador) object;
+        if ((this.idjugadores == null && other.idjugadores != null) || (this.idjugadores != null && !this.idjugadores.equals(other.idjugadores))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "casinoblackjack.negocio.banca.Jugadores[ idjugadores=" + idjugadores + " ]";
+    }
+
     public boolean getActivo() {
         return activo;
     }
@@ -107,18 +164,14 @@ public class Jugador
         this.activo = activo;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (idjugador != null ? idjugador.hashCode() : 0);
-        return hash;
+    public Turnos getTurnos() {
+        return turnos;
     }
 
-
-    @Override
-    public String toString() {
-        return "casinoblackjack.negocio.jugador.Jugador_1[ idjugador=" + idjugador + " ]";
+    public void setTurnos(Turnos turnos) {
+        this.turnos = turnos;
     }
-    
+
+   
     
 }

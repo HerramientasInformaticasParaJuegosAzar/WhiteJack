@@ -11,6 +11,8 @@ import casinoblackjack.negocio.cartas.Decision;
 import casinoblackjack.negocio.cartas.barajeador.Barajeador;
 import casinoblackjack.negocio.dealer.Dealer;
 import casinoblackjack.negocio.jugador.SA.SAJugador;
+import casinoblackjack.negocio.mesa.obs.Observable;
+import casinoblackjack.negocio.turno.Turno;
 import casinoblackjack.negocio.turno.Turnos;
 import java.util.ArrayList;
 
@@ -18,15 +20,30 @@ import java.util.ArrayList;
  *
  * @author Krnx
  */
-public class Mesa {
+public class Mesa extends Observable {
 
     private int id;
-    private Dealer dealer;
+    private final Dealer dealer;
     private ArrayList<SAJugador> jugadores;
     private Barajeador baraja;
+
     private Turnos turno;
+
+    private ArrayList<Carta> cartasQuemadas;
+
     private SABanca banca;
     private ArrayList<Integer> apuestas;
+    private SAJugador jugadorUI;
+    private int apuestaJugadorUI;
+    private boolean estaJugandoUI;
+
+    public void setJugadorUI(SAJugador jugadorUI) {
+        this.jugadorUI = jugadorUI;
+    }
+
+    public SAJugador getJugadorUI() {
+        return jugadorUI;
+    }
 
     public Mesa(int barajas) {
         this.dealer = new Dealer();
@@ -38,7 +55,8 @@ public class Mesa {
     }
 
     public ArrayList<Carta> getCartasEnMesa() {
-        ArrayList<Carta> cartas = new ArrayList<Carta>();
+        ArrayList<Carta> cartas;
+        cartas = new ArrayList<>();
         for (SAJugador jugador : jugadores) {
             cartas.addAll(jugador.getCartas());
         }
@@ -92,7 +110,7 @@ public class Mesa {
      *   Comprueba que el jugador en cuestión tiene dinero en alguna cuenta.
      */
     private void recogerApuestas() {
-        int posibleApuesta = 0;
+        int posibleApuesta;
         for (int i = 0; i < jugadores.size(); i++) {
             posibleApuesta = this.jugadores.get(i).apostar();
             if (puedeApostar(this.jugadores.get(i), posibleApuesta)) {
@@ -103,8 +121,14 @@ public class Mesa {
              */ {
                 this.apuestas.set(i, 0);
             }
+            if (estaJugandoUI) {
+                apostarJugadorUI();
+            }
+            notificarObservadores();
         }
     }
+
+
 
     /*   preguntarDecisiones()
      *
@@ -116,6 +140,9 @@ public class Mesa {
             if (this.apuestas.get(i) > 0) {
                 this.jugarTurno(jugadores.get(i), true, 0);
             }
+        }
+        if (estaJugandoUI && apuestaJugadorUI > 0) {
+
         }
         jugarTurno(dealer, true, 0);
     }
@@ -136,10 +163,14 @@ public class Mesa {
                 this.jugadorHit(jugador, esSplit);
                 break;
             case DOUBLE:
-                this.jugadorDouble(jugador, esSplit);
+                if (esPrimerTurno) {
+                    this.jugadorDouble(jugador, esSplit);
+                }
                 break;
             case SPLIT:
-                this.jugadorSplit(jugador);
+                if (esPrimerTurno) {
+                    this.jugadorSplit(jugador);
+                }
                 break;
             case PASS:
                 break;
@@ -167,6 +198,7 @@ public class Mesa {
      */
     private void jugadorHit(SAJugador jugador, int esSplit) {
         jugador.addCarta(this.baraja.obtenerCarta(), esSplit);
+        notificarObservadores();
         if (this.calcularValor(jugador) <= 21) {
             this.jugarTurno(jugador, false, esSplit);
         }
@@ -182,6 +214,7 @@ public class Mesa {
     private void jugadorDouble(SAJugador jugador, int esSplit) {
         if (puedeApostar(jugador)) {
             jugador.addCarta(this.baraja.obtenerCarta(), esSplit);
+            notificarObservadores();
         }
     }
 
@@ -192,6 +225,8 @@ public class Mesa {
     private void jugadorSplit(SAJugador jugador) {
         if (puedeApostar(jugador)) {
             if (puedeHacerSplit(jugador)) {
+                jugador.split();
+                notificarObservadores();
                 this.jugarTurno(jugador, false, 0);
                 this.jugarTurno(jugador, false, 1);
             }
@@ -204,8 +239,10 @@ public class Mesa {
      */
     private boolean puedeHacerSplit(SAJugador jugador) {
         ArrayList<Carta> cartas = jugador.getCartas();
-        if(cartas.size()!=2)return false;
-        return (cartas.get(0)==cartas.get(1));
+        if (cartas.size() != 2) {
+            return false;
+        }
+        return (cartas.get(0) == cartas.get(1));
     }
 
     /*   repartirCartas()
@@ -216,29 +253,92 @@ public class Mesa {
         for (SAJugador jugador : jugadores) {
             jugador.addCarta(this.baraja.obtenerCarta());
             jugador.addCarta(this.baraja.obtenerCarta());
+            notificarObservadores();
         }
         dealer.addCarta(this.baraja.obtenerCarta());
+        notificarObservadores();
     }
-    
+
     /*   decidirGanador()
      *
      *   método para decidir ganador,
      *   recorre los jugadores para ver quien gana y despues reparte el dinero
      */
     private void decidirGanador() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        int valorManoDealer = this.calcularValor(dealer);
+        if (valorManoDealer == 21) {
+            ganaDealer();
+        } else {
+            int valorManoJugador;
+            for (SAJugador jugador : jugadores) {
+                valorManoJugador = calcularValor(jugador);
+                if (valorManoJugador == 21) {
+                    darDinero(jugador, 2.5);
+                } else if (valorManoDealer >= valorManoJugador) {
+                    darDinero(jugador, 2.5);
+                } else {
+                    darDinero(jugador, 0);
+                }
+                notificarObservadores();
+            }
+        }
     }
+
+    /*   ganaDealer()
+     *
+     *   método para  quitar el dinero a los jugadores, porque el dealer tiene 21
+     */
+    private void ganaDealer() {
+        for (int i = 0; i < apuestas.size(); i++) {
+            if (calcularValor(jugadores.get(i)) == 21) {
+                darDinero(jugadores.get(i), 1);
+            } else {
+                apuestas.set(i, 0);
+            }
+            notificarObservadores();
+        }
+    }
+
+    /*   darDinero(SAJugador jugador, double d) 
+     *
+     *   da dinero al jugador en funcion del multiplicador
+     *   en caso de hacer blackjack es 2.5
+     *   en caso contrario será 2
+     *   si el jugador pierde será 0
+     */
+    private void darDinero(SAJugador jugador, double multiplicador) {
+        if (multiplicador == 0) {
+            apuestas.set(jugadores.indexOf(jugador), 0);
+        } else {
+            banca.incrementarSaldo(multiplicador);
+        }
+    }
+
+    private void limpiarMesa() {
+        for (int i = 0; i < apuestas.size(); i++) {
+            apuestas.set(i, 0);
+        }
+        cartasQuemadas.addAll(getCartasEnMesa());
+        cartasQuemadas.addAll(dealer.getCartas());
+        for (SAJugador jugador : jugadores) {
+            jugador.quemarCartas();
+        }
+        dealer.quemarCartas();
+        notificarObservadores();
+    }
+
 
     /*   jugarTurno()
      *
      *   bucle del juego
      */
     public void jugarTurno() {
+        estaJugandoUI = isSetJuegoUI();
         recogerApuestas();
         repartirCartas();
         preguntarDecisiones();
         decidirGanador();
+        limpiarMesa();
     }
-
 
 }

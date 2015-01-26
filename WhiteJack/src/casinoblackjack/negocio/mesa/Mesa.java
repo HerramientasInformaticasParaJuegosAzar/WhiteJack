@@ -29,6 +29,17 @@ public class Mesa extends Observable {
     private Turno turno;
     private SABanca banca;
     private ArrayList<Integer> apuestas;
+    private SAJugador jugadorUI;
+    private int apuestaJugadorUI;
+    private boolean estaJugandoUI;
+
+    public void setJugadorUI(SAJugador jugadorUI) {
+        this.jugadorUI = jugadorUI;
+    }
+
+    public SAJugador getJugadorUI() {
+        return jugadorUI;
+    }
 
     public Mesa(int barajas) {
         this.dealer = new Dealer(null);
@@ -105,9 +116,14 @@ public class Mesa extends Observable {
              */ {
                 this.apuestas.set(i, 0);
             }
+            if (estaJugandoUI) {
+                apostarJugadorUI();
+            }
             notificarObservadores();
         }
     }
+
+
 
     /*   preguntarDecisiones()
      *
@@ -118,6 +134,9 @@ public class Mesa extends Observable {
             if (this.apuestas.get(i) > 0) {
                 this.jugarTurno(jugadores.get(i), true, 0);
             }
+        }
+        if (estaJugandoUI && apuestaJugadorUI > 0) {
+
         }
         jugarTurno(dealer, true, 0);
     }
@@ -307,6 +326,7 @@ public class Mesa extends Observable {
      *   bucle del juego
      */
     public void jugarTurno() {
+        estaJugandoUI = isSetJuegoUI();
         recogerApuestas();
         repartirCartas();
         preguntarDecisiones();

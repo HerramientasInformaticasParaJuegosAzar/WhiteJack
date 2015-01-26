@@ -16,30 +16,30 @@
  */
 package casinoblackjack.negocio.mesa.ui;
 
+import casinoblackjack.negocio.cartas.Decision;
 import casinoblackjack.negocio.jugador.SA.imp.SAJugadorImp;
+import casinoblackjack.negocio.mesa.Mesa;
 import casinoblackjack.negocio.mesa.obs.Observador;
 import java.util.ArrayList;
-import java.util.Collection;
-import javax.swing.ListModel;
 
 /**
  *
  * @author Vik
  */
-public class MainWindow extends javax.swing.JFrame implements Observador{
+public class MainWindow extends javax.swing.JFrame implements Observador {
 
-    
     private ArrayList<SAJugadorImp> jugadores;
-    
+    private Decision decision;
+    private Mesa mesa;
+
     /**
      * Creates new form MainWindow
      */
-    public MainWindow(ArrayList<SAJugadorImp> jugadores) {
+    public MainWindow(ArrayList<SAJugadorImp> jugadores, Mesa mesa) {
         initComponents();
-        this.jugadores=jugadores;
+        this.jugadores = jugadores;
+        this.mesa = mesa;
     }
-    
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -66,6 +66,7 @@ public class MainWindow extends javax.swing.JFrame implements Observador{
         jTextField3 = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
         jTextField4 = new javax.swing.JTextField();
+        botonJugar = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextPane1 = new javax.swing.JTextPane();
@@ -78,9 +79,11 @@ public class MainWindow extends javax.swing.JFrame implements Observador{
         jLabel3 = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
         jTextPane4 = new javax.swing.JTextPane();
-        jButton3 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        botonSplit = new javax.swing.JButton();
+        botonDoblar = new javax.swing.JButton();
+        botonPedirCarta = new javax.swing.JButton();
+        spinnerApostar = new javax.swing.JSpinner();
+        botonApostar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("WhiteJack (BlackJack Analyzer)");
@@ -119,31 +122,38 @@ public class MainWindow extends javax.swing.JFrame implements Observador{
 
         jTextField4.setText("0,8%");
 
+        botonJugar.setText("Jugar");
+        botonJugar.setActionCommand("");
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(14, 14, 14)
-                        .addComponent(jLabel7)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
-                            .addComponent(jLabel10)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(jTextField4))
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
-                            .addComponent(jLabel9)
+                        .addComponent(botonJugar, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(1, 1, 1))
+                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel3Layout.createSequentialGroup()
+                            .addGap(14, 14, 14)
+                            .addComponent(jLabel7)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jTextField3))
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
-                            .addComponent(jLabel8)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
+                                .addComponent(jLabel10)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jTextField4))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
+                                .addComponent(jLabel9)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTextField3))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
+                                .addComponent(jLabel8)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap(28, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -165,7 +175,9 @@ public class MainWindow extends javax.swing.JFrame implements Observador{
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel10)
                     .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(31, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
+                .addComponent(botonJugar, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -224,26 +236,28 @@ public class MainWindow extends javax.swing.JFrame implements Observador{
         jTextPane4.setEditable(false);
         jScrollPane4.setViewportView(jTextPane4);
 
-        jButton3.setText("Split");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        botonSplit.setText("Split");
+        botonSplit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                botonSplitActionPerformed(evt);
             }
         });
 
-        jButton2.setText("Doblar");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        botonDoblar.setText("Doblar");
+        botonDoblar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                botonDoblarActionPerformed(evt);
             }
         });
 
-        jButton1.setText("Pediir Carta");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        botonPedirCarta.setText("Pediir Carta");
+        botonPedirCarta.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                botonPedirCartaActionPerformed(evt);
             }
         });
+
+        botonApostar.setText("Apostar");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -257,20 +271,25 @@ public class MainWindow extends javax.swing.JFrame implements Observador{
                         .addComponent(jScrollPane2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel3))
-                        .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(botonPedirCarta, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(botonDoblar, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(botonSplit, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(spinnerApostar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(botonApostar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(16, 16, 16)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -290,11 +309,15 @@ public class MainWindow extends javax.swing.JFrame implements Observador{
                 .addComponent(jLabel3)
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane4)
-                .addGap(18, 18, 18)
+                .addGap(8, 8, 8)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton3)
-                    .addComponent(jButton2)
-                    .addComponent(jButton1))
+                    .addComponent(spinnerApostar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(botonApostar))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(botonSplit)
+                    .addComponent(botonDoblar)
+                    .addComponent(botonPedirCarta))
                 .addContainerGap())
         );
 
@@ -321,17 +344,17 @@ public class MainWindow extends javax.swing.JFrame implements Observador{
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void botonPedirCartaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonPedirCartaActionPerformed
         pedirCarta();        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_botonPedirCartaActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        doblar();   
-    }//GEN-LAST:event_jButton2ActionPerformed
+    private void botonDoblarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonDoblarActionPerformed
+        doblar();
+    }//GEN-LAST:event_botonDoblarActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void botonSplitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonSplitActionPerformed
         hacerSplit();
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_botonSplitActionPerformed
 
     /**
      * @param args the command line arguments
@@ -363,31 +386,32 @@ public class MainWindow extends javax.swing.JFrame implements Observador{
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                SAJugadorImp vik =new  SAJugadorImp(null);
-                
-                SAJugadorImp dan1 =new  SAJugadorImp(null);
-                
-                SAJugadorImp dan2 =new  SAJugadorImp(null);
-                
-                
-                SAJugadorImp ivn =new  SAJugadorImp(null);
-                
+                SAJugadorImp vik = new SAJugadorImp(null);
+
+                SAJugadorImp dan1 = new SAJugadorImp(null);
+
+                SAJugadorImp dan2 = new SAJugadorImp(null);
+
+                SAJugadorImp ivn = new SAJugadorImp(null);
+
                 ArrayList<SAJugadorImp> jugadores = new ArrayList<>();
-                
+
                 jugadores.add(vik);
                 jugadores.add(dan1);
                 jugadores.add(dan2);
                 jugadores.add(ivn);
-                
-                new MainWindow(jugadores).setVisible(true);
+
+                new MainWindow(jugadores,null).setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
+    private javax.swing.JButton botonApostar;
+    private javax.swing.JButton botonDoblar;
+    private javax.swing.JButton botonJugar;
+    private javax.swing.JButton botonPedirCarta;
+    private javax.swing.JButton botonSplit;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
@@ -416,22 +440,74 @@ public class MainWindow extends javax.swing.JFrame implements Observador{
     private javax.swing.JTextPane jTextPane2;
     private javax.swing.JTextPane jTextPane3;
     private javax.swing.JTextPane jTextPane4;
+    private javax.swing.JSpinner spinnerApostar;
     // End of variables declaration//GEN-END:variables
 
     private void pedirCarta() {
-        System.out.println("ASD");
+        this.decision=Decision.HIT;
     }
 
     private void hacerSplit() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        this.decision=Decision.SPLIT;
     }
 
     private void doblar() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        this.decision=Decision.DOUBLE;
     }
 
     @Override
     public void actualizar() {
+        this.mesa.getCartasEnMesa();
+    }
+
+    public void desactivarBotonesApuesta() {
+        this.botonApostar.setEnabled(false);
+        this.spinnerApostar.setEnabled(false);
+    }
+
+    public void activarBotonesApuesta() {
+        this.botonApostar.setEnabled(true);
+        this.spinnerApostar.setEnabled(true);
+    }
+
+    public void desactivarBotonesTurno() {
+        this.botonDoblar.setEnabled(false);
+        this.botonPedirCarta.setEnabled(false);
+        this.botonSplit.setEnabled(false);        
+    }
+
+    public void activarBotonesTurno(boolean activarSplitDouble) {
+        this.botonDoblar.setEnabled(activarSplitDouble);
+        this.botonPedirCarta.setEnabled(true);
+        this.botonSplit.setEnabled(activarSplitDouble);   
+    }
+    
+    public void desactivarBotonJuego(){
+        this.botonJugar.setEnabled(false);
+    }
+    
+    public void activarBotonJuego(){
+        this.botonJugar.setEnabled(true);
+    }
+    
+    public Decision getDecision(){
+        return this.decision;
+    }
+
+    @Override
+    public boolean isSetJuegoUI() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    public Decision getDecisionJugadorUI() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public int getApuestaJugadorUI() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
 }

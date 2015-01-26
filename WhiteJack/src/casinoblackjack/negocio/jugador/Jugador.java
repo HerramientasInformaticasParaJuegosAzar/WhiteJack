@@ -35,6 +35,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import casinoblackjack.negocio.cartas.Carta;
+
 /**
  *
  * @author Krnx
@@ -174,4 +176,10 @@ public class Jugador implements Serializable {
 
    
     
+    
+    public abstract Decision juegoTurno(Carta[] cartasMesa, Decision posiblesDecisiones);
+    // Decision juegaTurno(Cartas....)
+    
+    // atributos: user, pass, cantidadApuesta
+    //jugador.getCAntida
 }

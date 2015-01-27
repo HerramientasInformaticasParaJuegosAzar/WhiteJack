@@ -47,7 +47,7 @@ public class Turnos implements Serializable {
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "resultado")
     private Double resultado;
-    @JoinColumn(name = "jugador", referencedColumnName = "idjugadores")
+    @JoinColumn(name = "jugador", referencedColumnName = "idjugadores", insertable = false, updatable = false)
     @OneToOne(optional = false)
     private Jugador jugador1;
 

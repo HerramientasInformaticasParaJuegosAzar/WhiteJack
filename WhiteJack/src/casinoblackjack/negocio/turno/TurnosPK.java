@@ -41,6 +41,10 @@ public class TurnosPK implements Serializable {
         this.idturnos = idturnos;
         this.jugador = jugador;
     }
+    public TurnosPK(int jugador) 
+    {
+        this.jugador = jugador;
+    }
 
     public int getIdturnos() {
         return idturnos;

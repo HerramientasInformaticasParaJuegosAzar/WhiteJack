@@ -16,26 +16,42 @@
  */
 package casinoblackjack.negocio.juego;
 
+import casinoblackjack.negocio.jugador.SA.SAJugador;
 import casinoblackjack.negocio.mesa.Mesa;
+import casinoblackjack.negocio.mesa.ui.MainWindow;
+import java.util.ArrayList;
 
 /**
  *
  * @author Vik
  */
-public class Juego {
-    
+public class Juego{
+
     private Mesa mesa;
-   
+
+    private SAJugador jugadorUI;
+
+    ArrayList<SAJugador> jugadores;
+
+    public ArrayList<SAJugador> getJugadores() {
+        return jugadores;
+    }
+
     public Juego(){
         this.mesa = new Mesa(2);
-    }    
-    
-    public void Jugar(){
-        while (true) {            
-            mesa.jugarTurno();
-        }
+        jugadores = this.crearJugadores();
     }
-    
-    
-    
+
+    public Mesa getMesa() {
+        return mesa;
+    }
+
+    public SAJugador getJugadorUI() {
+        return jugadorUI;
+    }
+
+    private ArrayList<SAJugador> crearJugadores() {
+        return null;
+    }
+
 }

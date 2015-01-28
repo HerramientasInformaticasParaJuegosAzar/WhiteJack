@@ -6,6 +6,6 @@ import casinoblackjack.negocio.cartas.Decision;
 *tienen un metodo actualizar() para reaccionar a cambios del sujeto
 */
 public interface Observador {
-    public void actualizar();
-    public boolean isSetJuegoUI();
+    public void actualizarApuestas();
+    public void actualizarCartas();
 }

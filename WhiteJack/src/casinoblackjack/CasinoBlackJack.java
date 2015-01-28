@@ -13,12 +13,5 @@ import casinoblackjack.negocio.juego.Juego;
  */
 public class CasinoBlackJack {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        Juego juego = new Juego();
-        
-    }
     
 }

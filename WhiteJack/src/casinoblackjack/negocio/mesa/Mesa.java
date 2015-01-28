@@ -12,7 +12,6 @@ import casinoblackjack.negocio.cartas.barajeador.Barajeador;
 import casinoblackjack.negocio.dealer.Dealer;
 import casinoblackjack.negocio.jugador.SA.SAJugador;
 import casinoblackjack.negocio.mesa.obs.Observable;
-import casinoblackjack.negocio.turno.Turno;
 import casinoblackjack.negocio.turno.Turnos;
 import java.util.ArrayList;
 
@@ -33,17 +32,6 @@ public class Mesa extends Observable {
 
     private SABanca banca;
     private ArrayList<Integer> apuestas;
-    private SAJugador jugadorUI;
-    private int apuestaJugadorUI;
-    private boolean estaJugandoUI;
-
-    public void setJugadorUI(SAJugador jugadorUI) {
-        this.jugadorUI = jugadorUI;
-    }
-
-    public SAJugador getJugadorUI() {
-        return jugadorUI;
-    }
 
     public Mesa(int barajas) {
         this.dealer = new Dealer();
@@ -57,8 +45,10 @@ public class Mesa extends Observable {
     public ArrayList<Carta> getCartasEnMesa() {
         ArrayList<Carta> cartas;
         cartas = new ArrayList<>();
-        for (SAJugador jugador : jugadores) {
-            cartas.addAll(jugador.getCartas());
+        if (jugadores != null) {
+            for (SAJugador jugador : jugadores) {
+                cartas.addAll(jugador.getCartas());
+            }
         }
         cartas.addAll(this.dealer.getCartas());
         return cartas;
@@ -88,7 +78,6 @@ public class Mesa extends Observable {
      *       para ello le pregunta a la banca por sus cuentas 
      *       y luego comprueba si con alguna de ellas puede apostar.
      */
-    
     private boolean puedeApostar(SAJugador jugador) {
         //busca la apuesta del jugador 
         int indexJugador = this.jugadores.indexOf((SAJugador) jugador);
@@ -111,38 +100,32 @@ public class Mesa extends Observable {
      */
     private void recogerApuestas() {
         int posibleApuesta;
-        for (int i = 0; i < jugadores.size(); i++) {
-            posibleApuesta = this.jugadores.get(i).apostar();
-            if (puedeApostar(this.jugadores.get(i), posibleApuesta)) {
-                this.apuestas.set(i, posibleApuesta);
-            } else /*
-             * Si el jugador no tiene dinero para apostar, su apuesta será 0
-             * si el jugador no apuesta no podrá jugar este turno.
-             */ {
-                this.apuestas.set(i, 0);
+        if (jugadores != null) {
+            for (int i = 0; i < jugadores.size(); i++) {
+                posibleApuesta = this.jugadores.get(i).apostar();
+                if (puedeApostar(this.jugadores.get(i), posibleApuesta)) {
+                    this.apuestas.set(i, posibleApuesta);
+                } else /*
+                 * Si el jugador no tiene dinero para apostar, su apuesta será 0
+                 * si el jugador no apuesta no podrá jugar este turno.
+                 */ {
+                    this.apuestas.set(i, 0);
+                }
+
             }
-            if (estaJugandoUI) {
-                apostarJugadorUI();
-            }
-            notificarObservadores();
         }
+        actualizarApuestas();
     }
-
-
 
     /*   preguntarDecisiones()
      *
      *   Pregunta a cada jugador por una decisión siempre que haya apostado algo.
      */
-    
     private void preguntarDecisiones() {
         for (int i = 0; i < jugadores.size(); i++) {
             if (this.apuestas.get(i) > 0) {
                 this.jugarTurno(jugadores.get(i), true, 0);
             }
-        }
-        if (estaJugandoUI && apuestaJugadorUI > 0) {
-
         }
         jugarTurno(dealer, true, 0);
     }
@@ -198,7 +181,7 @@ public class Mesa extends Observable {
      */
     private void jugadorHit(SAJugador jugador, int esSplit) {
         jugador.addCarta(this.baraja.obtenerCarta(), esSplit);
-        notificarObservadores();
+        actualizarCartas();
         if (this.calcularValor(jugador) <= 21) {
             this.jugarTurno(jugador, false, esSplit);
         }
@@ -210,11 +193,10 @@ public class Mesa extends Observable {
      *  si es split, se la añade al conjunto de cartas correspondiente
      *  luego deja de pedir cartas
      */
-    
     private void jugadorDouble(SAJugador jugador, int esSplit) {
         if (puedeApostar(jugador)) {
             jugador.addCarta(this.baraja.obtenerCarta(), esSplit);
-            notificarObservadores();
+            actualizarCartas();
         }
     }
 
@@ -226,7 +208,7 @@ public class Mesa extends Observable {
         if (puedeApostar(jugador)) {
             if (puedeHacerSplit(jugador)) {
                 jugador.split();
-                notificarObservadores();
+                actualizarCartas();
                 this.jugarTurno(jugador, false, 0);
                 this.jugarTurno(jugador, false, 1);
             }
@@ -253,10 +235,11 @@ public class Mesa extends Observable {
         for (SAJugador jugador : jugadores) {
             jugador.addCarta(this.baraja.obtenerCarta());
             jugador.addCarta(this.baraja.obtenerCarta());
-            notificarObservadores();
+            actualizarApuestas();
         }
         dealer.addCarta(this.baraja.obtenerCarta());
-        notificarObservadores();
+        actualizarApuestas();
+
     }
 
     /*   decidirGanador()
@@ -279,7 +262,7 @@ public class Mesa extends Observable {
                 } else {
                     darDinero(jugador, 0);
                 }
-                notificarObservadores();
+                actualizarCartas();
             }
         }
     }
@@ -295,7 +278,7 @@ public class Mesa extends Observable {
             } else {
                 apuestas.set(i, 0);
             }
-            notificarObservadores();
+            actualizarCartas();
         }
     }
 
@@ -310,7 +293,7 @@ public class Mesa extends Observable {
         if (multiplicador == 0) {
             apuestas.set(jugadores.indexOf(jugador), 0);
         } else {
-            banca.incrementarSaldo(multiplicador);
+            banca.incrementarSaldo(id, multiplicador);
         }
     }
 
@@ -324,7 +307,7 @@ public class Mesa extends Observable {
             jugador.quemarCartas();
         }
         dealer.quemarCartas();
-        notificarObservadores();
+        actualizarCartas();
     }
 
 
@@ -333,7 +316,6 @@ public class Mesa extends Observable {
      *   bucle del juego
      */
     public void jugarTurno() {
-        estaJugandoUI = isSetJuegoUI();
         recogerApuestas();
         repartirCartas();
         preguntarDecisiones();

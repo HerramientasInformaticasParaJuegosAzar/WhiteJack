@@ -5,8 +5,6 @@ package casinoblackjack.negocio.mesa.obs;
  *y un metodo de notificacion. La asociacion Observable-Observadores
  *se implementa mediante un vector de observadores
  */
-import casinoblackjack.negocio.cartas.Decision;
-import java.util.ArrayList;
 
 public abstract class Observable {
 
@@ -21,12 +19,12 @@ public abstract class Observable {
     }
 
     //Notificacion: Para cada observador se invoca el método actualizar().
-    public void notificarObservadores() {
-        _observador.actualizar();
+    public void actualizarCartas() {
+        _observador.actualizarCartas();
     }
-
-    public boolean isSetJuegoUI() {
-        return _observador.isSetJuegoUI();
+    
+    public void actualizarApuestas() {
+        _observador.actualizarApuestas();
     }
     
     //Este atributo privado mantiene el vector con los observadores

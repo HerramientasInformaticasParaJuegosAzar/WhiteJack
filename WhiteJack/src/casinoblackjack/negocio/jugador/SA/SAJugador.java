@@ -42,4 +42,8 @@ public interface SAJugador
     public abstract Decision makeDecision(Carta cartaDealer, ArrayList<Carta> cartasEnMesa);
 
     public abstract void addCarta(Carta carta, int esSplit);
+
+    public void split();
+
+    public void quemarCartas();
 }

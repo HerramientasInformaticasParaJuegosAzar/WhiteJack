@@ -5,6 +5,7 @@
  */
 package casinoblackjack.negocio.cuentas.SA.imp;
 
+import casinoblackjack.negocio.EntityFactory.EntityFactorySingleton;
 import casinoblackjack.negocio.cuentas.Cuenta;
 import casinoblackjack.negocio.cuentas.SA.SABanca;
 import casinoblackjack.negocio.jugador.Jugador;
@@ -33,7 +34,7 @@ public class SABancaImp implements SABanca
         EntityManagerFactory ef = null;
         try 
         {
-            ef = Persistence.createEntityManagerFactory("WhiteJackPU");
+            ef = EntityFactorySingleton.getInstance();
             em = ef.createEntityManager();
             
             em.getTransaction().begin();
@@ -89,7 +90,7 @@ public class SABancaImp implements SABanca
         EntityManagerFactory ef = null;
         try 
         {
-            ef= Persistence.createEntityManagerFactory("WhiteJackPU");
+            ef= EntityFactorySingleton.getInstance();
             em = ef.createEntityManager();
             Cuenta c = em.find(Cuenta.class, idCuenta);
             saldo = c.getSaldo();
@@ -124,7 +125,7 @@ public class SABancaImp implements SABanca
         EntityManagerFactory ef = null;
         try 
         {
-            ef = Persistence.createEntityManagerFactory("WhiteJackPU");
+            ef = EntityFactorySingleton.getInstance();
             em = ef.createEntityManager();
             
             em.getTransaction().begin();
@@ -154,7 +155,7 @@ public class SABancaImp implements SABanca
         
         try 
         {
-            EntityManagerFactory ef = Persistence.createEntityManagerFactory("WhiteJackPU");
+            EntityManagerFactory ef = EntityFactorySingleton.getInstance();
             em = ef.createEntityManager();
             em.getTransaction().begin();
             Cuenta persistentCuenta = em.find(Cuenta.class, idCuenta);
@@ -195,7 +196,7 @@ public class SABancaImp implements SABanca
         
         try 
         {
-            EntityManagerFactory ef = Persistence.createEntityManagerFactory("WhiteJackPU");
+            EntityManagerFactory ef = EntityFactorySingleton.getInstance();
             em = ef.createEntityManager();
             em.getTransaction().begin();
             Cuenta persistentCuenta = em.find(Cuenta.class, idCuenta);
@@ -236,7 +237,7 @@ public class SABancaImp implements SABanca
         
         try 
         {
-            EntityManagerFactory ef = Persistence.createEntityManagerFactory("WhiteJackPU");
+            EntityManagerFactory ef = EntityFactorySingleton.getInstance();
             em = ef.createEntityManager();
             em.getTransaction().begin();
             Cuenta persistentCuenta = em.find(Cuenta.class, idCuenta);
@@ -277,7 +278,7 @@ public class SABancaImp implements SABanca
         EntityManagerFactory ef = null;
         try 
         {
-            ef = Persistence.createEntityManagerFactory("WhiteJackPU");
+            ef = EntityFactorySingleton.getInstance();
             em = ef.createEntityManager();
             
             em.getTransaction().begin();

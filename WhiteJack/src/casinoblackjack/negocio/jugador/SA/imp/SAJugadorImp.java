@@ -17,6 +17,7 @@
 
 package casinoblackjack.negocio.jugador.SA.imp;
 
+import casinoblackjack.negocio.EntityFactory.EntityFactorySingleton;
 import casinoblackjack.negocio.cartas.Carta;
 import casinoblackjack.negocio.cartas.Decision;
 import casinoblackjack.negocio.jugador.Jugador;
@@ -45,7 +46,7 @@ public class SAJugadorImp implements SAJugador
         EntityManagerFactory ef = null;
         try 
         {
-            ef = Persistence.createEntityManagerFactory("WhiteJackPU");
+            ef = EntityFactorySingleton.getInstance();
             em = ef.createEntityManager();
             
             em.getTransaction().begin();
@@ -102,7 +103,7 @@ public class SAJugadorImp implements SAJugador
         EntityManagerFactory ef =null;
         try {
            
-            ef= Persistence.createEntityManagerFactory("MerkaSoftPU");
+            ef= EntityFactorySingleton.getInstance();
             em = ef.createEntityManager();
         
             em.getTransaction().begin();
@@ -151,7 +152,7 @@ public class SAJugadorImp implements SAJugador
        EntityManager em = null;
         boolean correcto = true;
         try {
-            EntityManagerFactory ef = Persistence.createEntityManagerFactory("MerkaSoftPU");
+            EntityManagerFactory ef = EntityFactorySingleton.getInstance();
             em = ef.createEntityManager();
             em.getTransaction().begin();
             Jugador persistentJugador = em.find(Jugador.class, id);
@@ -179,7 +180,7 @@ public class SAJugadorImp implements SAJugador
         EntityManager em = null;
         EntityManagerFactory ef = null;
         
-        ef = Persistence.createEntityManagerFactory("WhiteJackPU");
+        ef = EntityFactorySingleton.getInstance();
         em = ef.createEntityManager();
         
         Jugador jugador = null;

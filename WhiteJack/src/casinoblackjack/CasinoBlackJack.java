@@ -12,6 +12,10 @@ import casinoblackjack.negocio.juego.Juego;
  * @author Krnx
  */
 public class CasinoBlackJack {
+    
+    public static void main(String[] args){
+        Juego juego = new Juego();
+    }
 
     
 }

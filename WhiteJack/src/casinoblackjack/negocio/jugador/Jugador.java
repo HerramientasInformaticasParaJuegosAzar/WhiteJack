@@ -47,7 +47,7 @@ import casinoblackjack.negocio.cartas.Carta;
 @NamedQueries({
     @NamedQuery(name = "Jugador.findAll", query = "SELECT j FROM Jugador j"),
     @NamedQuery(name = "Jugador.findByIdjugadores", query = "SELECT j FROM Jugador j WHERE j.idjugadores = :idjugadores"),
-    
+    @NamedQuery(name = "Jugador.findByIdUsuario", query = "SELECT j FROM Jugador j WHERE j.usuario = :usuario"),
     @NamedQuery(name = "Jugador.findByPassword", query = "SELECT j FROM Jugador j WHERE j.password = :password"),
     @NamedQuery(name = "Jugador.findByFechaRegistro", query = "SELECT j FROM Jugador j WHERE j.fechaRegistro = :fechaRegistro"),
     @NamedQuery(name = "Jugador.findByActivo", query = "SELECT j FROM Jugador j WHERE j.activo = :activo")})

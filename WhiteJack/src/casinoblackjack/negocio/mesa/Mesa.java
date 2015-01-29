@@ -102,7 +102,7 @@ public class Mesa extends Observable {
         int indexJugador = this.jugadores.indexOf((SAJugador) jugador);
         int posibleApuesta = this.apuestas.get(indexJugador);
 
-        ArrayList<Integer> cuentas = null; //banca.getCuentasJugador(jugador.getIDJugador());
+        ArrayList<Integer> cuentas = banca.obtenerCuentasJugador(jugador);
         for (Integer numCuenta : cuentas) {
             if (this.banca.consultarSaldoCuenta(numCuenta) >= posibleApuesta) {
                 this.apuestas.set(indexJugador, posibleApuesta * 2);

@@ -46,15 +46,15 @@ public class SAJugadorImp implements SAJugador
         EntityManagerFactory ef = null;
         try 
         {
-            ef = EntityFactorySingleton.getInstance();
+            ef = Persistence.createEntityManagerFactory("WhiteJackPU");
             em = ef.createEntityManager();
             
             em.getTransaction().begin();
             
             Jugador jugadorAux = null;
             
-            List results = em.createNamedQuery("Jugador.findByIdjugadores")
-            .setParameter("idjugadores", jugador.getIdjugadores())
+            List results = em.createNamedQuery("Jugador.findByIdUsuario")
+            .setParameter("usuario", jugador.getUsuario())
             .getResultList();
             
             if (results.size() > 0)
@@ -89,6 +89,7 @@ public class SAJugadorImp implements SAJugador
                 em.close();           
             if (ef != null)
                 ef.close();
+           
         }
         
         return jugador.getIdjugadores();
@@ -103,7 +104,7 @@ public class SAJugadorImp implements SAJugador
         EntityManagerFactory ef =null;
         try {
            
-            ef= EntityFactorySingleton.getInstance();
+            ef= Persistence.createEntityManagerFactory("WhiteJackPU");
             em = ef.createEntityManager();
         
             em.getTransaction().begin();
@@ -152,7 +153,7 @@ public class SAJugadorImp implements SAJugador
        EntityManager em = null;
         boolean correcto = true;
         try {
-            EntityManagerFactory ef = EntityFactorySingleton.getInstance();
+            EntityManagerFactory ef = Persistence.createEntityManagerFactory("WhiteJackPU");
             em = ef.createEntityManager();
             em.getTransaction().begin();
             Jugador persistentJugador = em.find(Jugador.class, id);
@@ -180,7 +181,7 @@ public class SAJugadorImp implements SAJugador
         EntityManager em = null;
         EntityManagerFactory ef = null;
         
-        ef = EntityFactorySingleton.getInstance();
+        ef = Persistence.createEntityManagerFactory("WhiteJackPU");
         em = ef.createEntityManager();
         
         Jugador jugador = null;

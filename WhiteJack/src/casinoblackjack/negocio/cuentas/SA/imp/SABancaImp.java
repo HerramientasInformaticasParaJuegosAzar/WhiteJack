@@ -9,6 +9,7 @@ import casinoblackjack.negocio.cuentas.Cuenta;
 import casinoblackjack.negocio.cuentas.SA.SABanca;
 import casinoblackjack.negocio.jugador.Jugador;
 import casinoblackjack.negocio.jugador.SA.imp.SAJugadorImp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -267,6 +268,42 @@ public class SABancaImp implements SABanca
         }
         return correcto;
     }
+    
+    public ArrayList<Integer> obtenerCuentasJugador(Jugador jugador)
+    {
+        ArrayList<Integer> cuentasDelJugador = new ArrayList<>();
+        
+        EntityManager em = null;
+        EntityManagerFactory ef = null;
+        try 
+        {
+            ef = Persistence.createEntityManagerFactory("WhiteJackPU");
+            em = ef.createEntityManager();
+            
+            em.getTransaction().begin();
+            
+            Cuenta cuentaAux = null;
+            
+            List results = em.createNamedQuery("Cuenta.obtenerCuentasJugador")
+            .setParameter("jugador", jugador)
+            .getResultList();
+            
+            if (results.size() > 0)
+                cuentasDelJugador.add((Integer)results.get(0));
+            
+           
+           
+        } 
+        finally 
+        {
+            if (em != null)             
+                em.close();           
+            if (ef != null)
+                ef.close();
+        }
+        
+        return cuentasDelJugador;
+    }
 
     public static void main(String args[])
     {
@@ -279,12 +316,20 @@ public class SABancaImp implements SABanca
         a.setSaldo(500);
         sa.altaCuenta(a);
                 */
-        
+      /*  
         Jugador jugador = new Jugador();
-        jugador.setUsuario("hooo4");
+        jugador.setUsuario("hooo84");
         jugador.setPassword("hoooo2");
         jugador.setFechaRegistro(null);
         jugador.setActivo(true);
         saJ.altaJugador(jugador);
+        System.out.println(jugador.getIdjugadores());
+        */
+        Jugador c = new Jugador();
+        c.setIdjugadores(1);
+        
+        ArrayList<Integer> b = sa.obtenerCuentasJugador(c);
+        for (int i = 0; i < b.size();i++)
+            System.out.println(b.get(i));
     }
 }

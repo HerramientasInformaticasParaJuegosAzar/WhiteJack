@@ -61,7 +61,7 @@ public class SAJugadorImp implements SAJugador
             
             if (jugadorAux != null)
             {
-                if (!jugadorAux.getActivo())
+                if (!jugadorAux.getActivo() && jugadorAux.getPassword().equalsIgnoreCase(jugador.getPassword()))
                 {
                     jugadorAux.setActivo(true);
                     em.merge(jugadorAux);
@@ -70,8 +70,8 @@ public class SAJugadorImp implements SAJugador
                 }
                 else
                 {
-                    System.out.println("Ya existe el jugador");
-                    em.getTransaction().rollback();
+                    if (jugadorAux.getPassword().equalsIgnoreCase(jugador.getPassword()))
+                    jugador.setIdjugadores(jugadorAux.getIdjugadores());
                 }
             }            
             else

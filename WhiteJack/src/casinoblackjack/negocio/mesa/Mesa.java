@@ -141,7 +141,8 @@ public class Mesa extends Observable {
      */
     private void jugarTurno(SAJugador jugador, boolean esPrimerTurno, int esSplit) {
         Decision decision = jugador.makeDecision(this.dealer.getCartas().get(0), this.getCartasEnMesa());
-        switch (decision) {
+        switch (decision) 
+        {
             case HIT:
                 this.jugadorHit(jugador, esSplit);
                 break;

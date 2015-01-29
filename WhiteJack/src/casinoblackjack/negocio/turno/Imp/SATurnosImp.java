@@ -14,10 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package casinoblackjack.negocio.turno;
+package casinoblackjack.negocio.turno.Imp;
 
 
+import casinoblackjack.negocio.turno.SATurno;
+import casinoblackjack.negocio.turno.Turnos;
+import casinoblackjack.negocio.turno.TurnosPK;
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -26,8 +30,10 @@ import javax.persistence.Persistence;
  *
  * @author Krnx
  */
-public class SATurnos implements Serializable {
+public class SATurnosImp implements SATurno
+{
 
+    @Override
     public int altaTurno(int idJugador, double resultado) 
     {
         
@@ -64,9 +70,42 @@ public class SATurnos implements Serializable {
         return turno.getTurnosPK().getIdturnos();
     }
     
+    @Override
+    public int obtenerUltimoTurno() 
+    {
+        
+        EntityManager em = null;
+        EntityManagerFactory ef = null;
+        
+        int turno = 0;
+        
+        try 
+        {
+            ef = Persistence.createEntityManagerFactory("WhiteJackPU");
+            em = ef.createEntityManager();
+            
+            em.getTransaction().begin();
+            
+           
+            
+            List results = em.createNamedQuery("Turnos.obtenerUltimoTurno")
+            .getResultList();
+            
+            if (results.size() > 0)
+                turno = (Integer)results.get(0);
+            
+            
+        }
+        catch(Exception e)
+        {
+            System.out.println("muy tarde para excepciones");
+        }
+        return turno;
+    }
+    
     public static void main(String args[])
     {
-        SATurnos sa = new SATurnos();
+        SATurnosImp sa = new SATurnosImp();
         sa.altaTurno(1, 500);
     }
     

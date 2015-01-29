@@ -42,7 +42,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Cuenta.findAll", query = "SELECT c FROM Cuenta c"),
     @NamedQuery(name = "Cuenta.findByIdcuentas", query = "SELECT c FROM Cuenta c WHERE c.idcuentas = :idcuentas"),
     @NamedQuery(name = "Cuenta.findBySaldo", query = "SELECT c FROM Cuenta c WHERE c.saldo = :saldo"),
-    @NamedQuery(name = "Cuenta.findByActiva", query = "SELECT c FROM Cuenta c WHERE c.activa = :activa")})
+    @NamedQuery(name = "Cuenta.findByActiva", query = "SELECT c FROM Cuenta c WHERE c.activa = :activa"),
+    @NamedQuery(name = "Cuenta.obtenerCuentasJugador", query = "SELECT c.idcuentas FROM Cuenta c WHERE c.jugador = :jugador")})
 public class Cuenta implements Serializable {
     @Basic(optional = false)
     @Column(name = "activa")

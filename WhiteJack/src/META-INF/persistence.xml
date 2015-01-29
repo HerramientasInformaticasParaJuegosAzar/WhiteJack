@@ -6,7 +6,7 @@
     <class>casinoblackjack.negocio.cuentas.Cuenta</class>
     <class>casinoblackjack.negocio.turno.Turnos</class>
     <properties>
-      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/blackjack"/>
+      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/blackjack?zeroDateTimeBehavior=convertToNull"/>
       <property name="javax.persistence.jdbc.password" value=""/>
       <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
       <property name="javax.persistence.jdbc.user" value="root"/>

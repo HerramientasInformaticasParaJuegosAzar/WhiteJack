@@ -23,6 +23,7 @@ import casinoblackjack.negocio.cartas.Decision;
 import casinoblackjack.negocio.jugador.Jugador;
 import casinoblackjack.negocio.jugador.SA.SAJugador;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -37,6 +38,12 @@ import javax.persistence.Persistence;
  */
 public class SAJugadorImp implements SAJugador 
 {
+    ArrayList<Carta> cartas;
+    int suma;
+    boolean dd;
+    boolean split;
+    
+    
     @Override
     public int altaJugador(Jugador jugador) 
     {
@@ -212,31 +219,178 @@ public class SAJugadorImp implements SAJugador
     @Override
     public void addCarta(Carta carta) 
     {
+        if(this.cartas.isEmpty())
+        {
+            this.suma = carta.getValor();          
+            this.dd = this.suma == 11;
+        }
+        else
+        {
+            this.suma = this.suma + carta.getValor();
+            this.dd = (this.dd || carta.getValor() == 11) && this.suma <= 21;
+        }
+       
+        this.cartas.add(carta);
+        this.split = this.cartas.size() == 2 && this.cartas.get(0).getValor() == this.cartas.get(1).getValor();
+    }
+
+    @Override
+    public ArrayList<Carta> getCartas() 
+    {
+        return this.cartas;
+    }
+
+    @Override
+    public int getIDJugador() 
+    {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public ArrayList<Carta> getCartas() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public int apostar(int apuestaMin, int apuestaMax) 
+    {
+        return apuestaMin;
     }
 
     @Override
-    public int getIDJugador() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Decision makeDecision(Carta cartaDealer, ArrayList<Carta> cartasEnMesa) 
+    {
+        int dealer = cartaDealer.getValor();
+        
+        if (this.suma > 18) 
+        {
+            return Decision.PASS;
+        }
+        else if (this.suma == 18)
+        {
+            if(dealer >= 2 && dealer <= 9 && dealer != 7 && this.split)
+            {
+                return Decision.SPLIT;
+            }
+            else if(dealer >= 9 && dealer <= 11 && this.dd)
+            {
+                return Decision.HIT;
+            }
+            else if(dealer >= 3 && dealer <= 6 && this.dd)
+            {
+                return Decision.DOUBLE;
+            }
+            else return Decision.PASS;
+        }
+        else if(this.suma == 17)
+        {
+            if(dealer >= 3 && dealer <= 6 && this.dd)
+            {
+                return Decision.DOUBLE;
+            }
+            else if (this.dd)
+            {
+                return Decision.HIT;
+            }
+            else return Decision.PASS;
+        }
+        else if(this.suma == 16)
+        {
+            if(dealer >= 2 && dealer <= 9 && this.split)
+            {
+                return Decision.SPLIT;
+            }
+            else if(dealer >= 4 && dealer <= 6 && this.dd)
+            {
+                return Decision.DOUBLE;
+            }
+            else if(dealer >= 7 && !this.dd || this.dd)
+            {
+                return Decision.HIT;
+            }
+            else return Decision.PASS;
+        }
+        else if (this.suma == 15)
+        {
+            if(dealer >= 4 && dealer <= 6 && this.dd)
+            {
+                return Decision.DOUBLE;
+            }
+            else if(dealer >= 7 || this.dd)
+            {
+                return Decision.HIT;
+            }
+            else return Decision.PASS;
+        }
+        else if (this.suma == 14)
+        {
+            if((dealer == 5 || dealer == 6) && this.dd)
+            {
+                return Decision.DOUBLE;
+            }
+            else if (dealer >= 2 && dealer <= 7 && this.split)
+            {
+                return Decision.SPLIT;
+            }
+            else if (this.dd || dealer > 7)
+            {
+                return Decision.HIT;
+            }
+            else return Decision.PASS;
+        }
+        else if(this.suma == 13)
+        {
+            if((dealer == 5 || dealer == 6) && this.dd)
+            {
+                return Decision.DOUBLE;
+            }
+            else if ((!this.dd && dealer > 7) || this.dd)
+            {
+                return Decision.HIT;
+            }
+            else return Decision.PASS;
+        }
+        else if(this.suma == 12)
+        {
+            if(dealer >= 3 && dealer <= 6 && this.split)
+            {
+                return Decision.SPLIT;
+            }
+            else if(dealer != 11 && this.dd)
+            {
+                return Decision.SPLIT;
+            }
+            else if(dealer >= 4 && dealer <= 6 && !this.dd)
+            {
+                return Decision.PASS;
+            }
+            else return Decision.HIT;
+        }
+        else if (this.suma == 11)
+        {
+            if(this.dd && dealer <= 9)
+            {
+                return Decision.DOUBLE;
+            }
+            else return Decision.HIT;
+        }
+        else if (this.suma == 10)
+        {
+            if(this.dd && dealer <= 9)
+            {
+                return Decision.DOUBLE;
+            }
+            else return Decision.HIT;
+        }
+        else if (this.suma == 9)
+        {
+            if(this.dd && dealer >= 3 && dealer <= 6)
+            {
+                return Decision.DOUBLE;
+            }
+            else return Decision.HIT;
+        }
+        else return Decision.HIT;   
     }
 
     @Override
-    public int apostar() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Decision makeDecision(Carta cartaDealer, ArrayList<Carta> cartasEnMesa) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void addCarta(Carta carta, int esSplit) {
+    public void addCarta(Carta carta, int esSplit) 
+    {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -249,5 +403,4 @@ public class SAJugadorImp implements SAJugador
     public void quemarCartas() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
 }

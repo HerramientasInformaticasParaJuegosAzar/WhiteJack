@@ -22,7 +22,8 @@ import java.util.ArrayList;
 public class Mesa extends Observable {
 
     private int id;
-    
+    private int apuestaMin;
+    private int apuestaMax;
     private final Dealer dealer;
     
     private ArrayList<SAJugador> jugadores;
@@ -44,7 +45,15 @@ public class Mesa extends Observable {
     public Mesa(int barajas) {
         this.dealer = new Dealer();
         this.baraja = new Barajeador(barajas);
-        this.jugadores= new ArrayList<>();
+        this.apuestaMin = 1;
+        this.apuestaMax = Integer.MAX_VALUE;
+    }
+    
+    public Mesa(int barajas, int apuestaMin, int apuestaMax) {
+        this.dealer = new Dealer();
+        this.baraja = new Barajeador(barajas);
+        this.apuestaMin = apuestaMin;
+        this.apuestaMax = apuestaMax;
     }
 
     public void addPlayer(SAJugador jugador) {
@@ -121,7 +130,7 @@ public class Mesa extends Observable {
         int posibleApuesta;
         if (jugadores != null) {
             for (int i = 0; i < jugadores.size(); i++) {
-                posibleApuesta = this.jugadores.get(i).apostar();
+                posibleApuesta = this.jugadores.get(i).apostar(this.apuestaMin, this.apuestaMax);
                 if (puedeApostar(this.jugadores.get(i), posibleApuesta)) {
                     this.apuestas.set(i, posibleApuesta);
                 } else /*

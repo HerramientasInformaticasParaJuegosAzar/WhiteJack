@@ -401,15 +401,4 @@ public class SAJugadorImp implements SAJugador
     public void quemarCartas() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
-    
-    
-    public static void main(String [ ] args){
-        
-        Date date = new Date();
-        Jugador jugador = new Jugador(1, "Pepe", "123", date, true);
-        SAJugadorImp sa = new SAJugadorImp();
-        int i = sa.altaJugador(jugador);
-    }
-    
 }

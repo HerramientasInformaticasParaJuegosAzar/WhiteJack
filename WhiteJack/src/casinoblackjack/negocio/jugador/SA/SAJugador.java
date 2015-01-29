@@ -37,7 +37,7 @@ public interface SAJugador
     public abstract ArrayList<Carta> getCartas();
     public abstract int getIDJugador();
 
-    public abstract int apostar();
+    public abstract int apostar(int apuestaMin, int apuestaMax);
 
     public abstract Decision makeDecision(Carta cartaDealer, ArrayList<Carta> cartasEnMesa);
 

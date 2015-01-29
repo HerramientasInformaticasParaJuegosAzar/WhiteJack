@@ -28,18 +28,22 @@ import java.util.ArrayList;
  */
 public interface SAJugador 
 {
-    public void altaJugador(Jugador jugador);
-    public void modificarJugador(Jugador jugador);
-    public void bajaJugador(Integer id);
+    public int altaJugador(Jugador jugador);
+    public boolean modificarJugador(Jugador jugador);
+    public boolean bajaJugador(Integer id);
     public Jugador mostrarJugador(Integer id);
     
     public abstract void addCarta(Carta carta);
     public abstract ArrayList<Carta> getCartas();
     public abstract int getIDJugador();
 
-    public abstract int apostar();
+    public abstract int apostar(int apuestaMin, int apuestaMax);
 
     public abstract Decision makeDecision(Carta cartaDealer, ArrayList<Carta> cartasEnMesa);
 
     public abstract void addCarta(Carta carta, int esSplit);
+
+    public void split();
+
+    public void quemarCartas();
 }

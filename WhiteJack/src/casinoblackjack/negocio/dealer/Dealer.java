@@ -15,8 +15,5 @@ import javax.persistence.EntityManagerFactory;
  */
 public class Dealer extends SAJugadorImp{
 
-    public Dealer(EntityManagerFactory emf) {
-        super(emf);
-    }
-    
+   
 }

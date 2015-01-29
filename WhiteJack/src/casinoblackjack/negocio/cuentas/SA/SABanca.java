@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package casinoblackjack.negocio.banca;
+package casinoblackjack.negocio.cuentas.SA;
 
+import casinoblackjack.negocio.cuentas.Cuenta;
 import java.util.ArrayList;
 
 /**
@@ -13,11 +14,10 @@ import java.util.ArrayList;
  */
 public interface SABanca 
 {
-    public int altaCuenta(int idJugador,double pastaPredefinida);
+    public int altaCuenta(Cuenta cuenta);
     public double consultarSaldoCuenta(int idCuenta);
-    public double consultarSaldoCuentas();
-    public boolean incrementarSaldo(double incremento);
-    public boolean decrementarSaldo(double decremento);
+    public double consultarSaldoCuentas(int idJugador);
+    public boolean incrementarSaldo(int idCuenta, double incremento);
+    public boolean decrementarSaldo(int idCuenta, double decremento);
     public boolean bajaCuenta(int idCuenta);
-    public ArrayList<Integer> getCuentasJugador(int idJugador);
 }

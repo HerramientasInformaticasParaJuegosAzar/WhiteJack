@@ -15,31 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package casinoblackjack.negocio.banca;
+package casinoblackjack.presentacion.vista.jugador;
 
 /**
  *
  * @author usuario_local
  */
-public class Banca 
-{
-    int idBanca;
-    double sueldo;
-
-    public int getIdBanca() {
-        return idBanca;
-    }
-
-    public void setIdBanca(int idBanca) {
-        this.idBanca = idBanca;
-    }
-
-    public double getSueldo() {
-        return sueldo;
-    }
-
-    public void setSueldo(double sueldo) {
-        this.sueldo = sueldo;
-    }
+public class VistaJugadorLogin {
     
 }

@@ -17,8 +17,13 @@
 
 package casinoblackjack.negocio.jugador.SA.imp;
 
+import casinoblackjack.negocio.EntityFactory.EntityFactorySingleton;
 import casinoblackjack.negocio.cartas.Carta;
 import casinoblackjack.negocio.cartas.Decision;
+import casinoblackjack.negocio.cartas.barajeador.Barajeador;
+import casinoblackjack.negocio.cartas.enumerados.Palo;
+import casinoblackjack.negocio.cartas.enumerados.Valor;
+import casinoblackjack.negocio.jugador.estrategias.Estrategia;
 import casinoblackjack.negocio.jugador.Jugador;
 import casinoblackjack.negocio.jugador.SA.SAJugador;
 import java.util.ArrayList;
@@ -37,11 +42,21 @@ import javax.persistence.Persistence;
  */
 public class SAJugadorImp implements SAJugador 
 {
-    ArrayList<Carta> cartas;
-    int suma;
-    boolean dd;
-    boolean split;
+    ArrayList<ArrayList<Carta>> cartas;
+    Estrategia estrategia;
     
+    
+    public SAJugadorImp()
+    {
+        this.cartas = new ArrayList<ArrayList<Carta>>();
+        this.estrategia = new Estrategia();
+    }
+    
+    public SAJugadorImp(Estrategia est)
+    {
+        this.cartas = new ArrayList<ArrayList<Carta>>();
+        this.estrategia = est;
+    }
     
     @Override
     public int altaJugador(Jugador jugador) 
@@ -59,8 +74,8 @@ public class SAJugadorImp implements SAJugador
             
             Jugador jugadorAux = null;
             
-            List results = em.createNamedQuery("Jugador.findByIdjugadores")
-            .setParameter("idjugadores", jugador.getIdjugadores())
+            List results = em.createNamedQuery("Jugador.findByIdUsuario")
+            .setParameter("usuario", jugador.getUsuario())
             .getResultList();
             
             if (results.size() > 0)
@@ -68,7 +83,7 @@ public class SAJugadorImp implements SAJugador
             
             if (jugadorAux != null)
             {
-                if (!jugadorAux.getActivo())
+                if (!jugadorAux.getActivo() && jugadorAux.getPassword().equalsIgnoreCase(jugador.getPassword()))
                 {
                     jugadorAux.setActivo(true);
                     em.merge(jugadorAux);
@@ -77,8 +92,8 @@ public class SAJugadorImp implements SAJugador
                 }
                 else
                 {
-                    System.out.println("Ya existe el jugador");
-                    em.getTransaction().rollback();
+                    if (jugadorAux.getPassword().equalsIgnoreCase(jugador.getPassword()))
+                    jugador.setIdjugadores(jugadorAux.getIdjugadores());
                 }
             }            
             else
@@ -95,6 +110,7 @@ public class SAJugadorImp implements SAJugador
                 em.close();           
             if (ef != null)
                 ef.close();
+           
         }
         
         return jugador.getIdjugadores();
@@ -214,191 +230,140 @@ public class SAJugadorImp implements SAJugador
         return jugador;
     }
 
+    
     @Override
-    public void addCarta(Carta carta) 
+    public void setEstrategia(Estrategia estrategia)
     {
-        if(this.cartas.isEmpty())
-        {
-            this.suma = carta.getValor();          
-            this.dd = this.suma == 11;
-        }
-        else
-        {
-            this.suma = this.suma + carta.getValor();
-            this.dd = (this.dd || carta.getValor() == 11) && this.suma <= 21;
-        }
-       
-        this.cartas.add(carta);
-        this.split = this.cartas.size() == 2 && this.cartas.get(0).getValor() == this.cartas.get(1).getValor();
+        this.estrategia = estrategia;
     }
-
+     
+    
     @Override
-    public ArrayList<Carta> getCartas() 
+    public ArrayList<Carta> getCartas(int nSplit) 
     {
-        return this.cartas;
+        return this.cartas.get(nSplit);
+    }
+    
+    @Override
+    public ArrayList<Carta> getCartas()
+    {
+        ArrayList<Carta> lista = new ArrayList<Carta>();
+        
+        for(int i = 0; i < this.cartas.size(); i++)
+        {
+            lista.addAll(this.cartas.get(i));
+        }
+        
+        return lista;
     }
 
     @Override
     public int getIDJugador() 
     {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return 1;
     }
 
     @Override
     public int apostar(int apuestaMin, int apuestaMax) 
     {
-        return apuestaMin;
+        return this.estrategia.apostar(apuestaMin, apuestaMax);
     }
 
     @Override
-    public Decision makeDecision(Carta cartaDealer, ArrayList<Carta> cartasEnMesa) 
+    public Decision makeDecision(Carta cartaDealer, ArrayList<Carta> cartasEnMesa, int nSplit)
     {
-        int dealer = cartaDealer.getValor();
+        return this.estrategia.makeDecision(cartaDealer, cartasEnMesa, this.cartas.get(nSplit)); 
+    }
+
+
+    @Override
+    public void addCarta(Carta carta, int nSplit) 
+    {
+       if(this.cartas.size() < nSplit + 1)
+       {
+           this.cartas.add(new ArrayList<Carta>());
+       }
+       
+       this.cartas.get(nSplit).add(carta);
+    }
+
+    @Override
+    public void split(int nSplit) 
+    {
+        Carta carta = this.cartas.get(nSplit).remove(1);
+        addCarta(carta, this.cartas.size());
+    }
+
+    @Override
+    public void quemarCartas() 
+    {
+        this.cartas = new ArrayList<ArrayList<Carta>>(); 
+    }
+
+    
+    @Override
+    public int numSplits()
+    {
+        return this.cartas.size();
+    }
+    
+    @Override
+    public void verCartasEnMesa(ArrayList<Carta> cartasEnMesa)
+    {
+        this.estrategia.contarCartas(cartasEnMesa);
+    }
+    
+    
+    public static void main(String [] args)
+    {
+        SAJugadorImp sa = new SAJugadorImp();
+        Barajeador baraja = new Barajeador(4);
         
-        if (this.suma > 18) 
+        baraja.barajear();
+        
+        Carta carta1 = new Carta(Valor.UNO, Palo.CLUBS);
+        sa.addCarta(carta1, 0);
+        Carta carta2 = new Carta(Valor.UNO, Palo.CLUBS);
+        sa.addCarta(carta2, 0);
+        Carta carta3 = new Carta(Valor.DOS, Palo.CLUBS);
+        
+        
+        
+        Decision d = sa.makeDecision(carta3, null, 0);
+        System.out.println(carta1.toString());
+        System.out.println(carta2.toString());
+        System.out.println(carta3.toString());
+        System.out.println(d);
+        
+        sa.split(0);
+        Carta carta4 = new Carta(Valor.DIEZ, Palo.CLUBS);
+        sa.addCarta(carta4, 0);
+        Carta carta5 = new Carta(Valor.CUATRO, Palo.CLUBS);
+        sa.addCarta(carta5, 1);
+        System.out.println(carta1.toString() + " " + carta4.toString());
+        System.out.println(carta2.toString() + " " + carta5.toString());
+        d = sa.makeDecision(carta3, null, 0);
+        System.out.println(d);
+        d = sa.makeDecision(carta3, null, 1);
+        System.out.println(d);
+        
+        ArrayList<Carta> lista = sa.getCartas();
+        String str = "";
+        for(Carta cart : lista)
         {
-            return Decision.PASS;
+            str = str + " " + cart.toString();
         }
-        else if (this.suma == 18)
+        System.out.println(str);
+        
+        for(int i = 0; i < sa.numSplits(); i++)
         {
-            if(dealer >= 2 && dealer <= 9 && dealer != 7 && this.split)
+            str = "";
+            ArrayList<Carta> list = sa.getCartas(i);
+            for(int j = 0; j < list.size(); j++)
             {
-                return Decision.SPLIT;
+                str = str + " " + list.get(j);
             }
-            else if(dealer >= 9 && dealer <= 11 && this.dd)
-            {
-                return Decision.HIT;
-            }
-            else if(dealer >= 3 && dealer <= 6 && this.dd)
-            {
-                return Decision.DOUBLE;
-            }
-            else return Decision.PASS;
+            System.out.println(str);
         }
-        else if(this.suma == 17)
-        {
-            if(dealer >= 3 && dealer <= 6 && this.dd)
-            {
-                return Decision.DOUBLE;
-            }
-            else if (this.dd)
-            {
-                return Decision.HIT;
-            }
-            else return Decision.PASS;
-        }
-        else if(this.suma == 16)
-        {
-            if(dealer >= 2 && dealer <= 9 && this.split)
-            {
-                return Decision.SPLIT;
-            }
-            else if(dealer >= 4 && dealer <= 6 && this.dd)
-            {
-                return Decision.DOUBLE;
-            }
-            else if(dealer >= 7 && !this.dd || this.dd)
-            {
-                return Decision.HIT;
-            }
-            else return Decision.PASS;
-        }
-        else if (this.suma == 15)
-        {
-            if(dealer >= 4 && dealer <= 6 && this.dd)
-            {
-                return Decision.DOUBLE;
-            }
-            else if(dealer >= 7 || this.dd)
-            {
-                return Decision.HIT;
-            }
-            else return Decision.PASS;
-        }
-        else if (this.suma == 14)
-        {
-            if((dealer == 5 || dealer == 6) && this.dd)
-            {
-                return Decision.DOUBLE;
-            }
-            else if (dealer >= 2 && dealer <= 7 && this.split)
-            {
-                return Decision.SPLIT;
-            }
-            else if (this.dd || dealer > 7)
-            {
-                return Decision.HIT;
-            }
-            else return Decision.PASS;
-        }
-        else if(this.suma == 13)
-        {
-            if((dealer == 5 || dealer == 6) && this.dd)
-            {
-                return Decision.DOUBLE;
-            }
-            else if ((!this.dd && dealer > 7) || this.dd)
-            {
-                return Decision.HIT;
-            }
-            else return Decision.PASS;
-        }
-        else if(this.suma == 12)
-        {
-            if(dealer >= 3 && dealer <= 6 && this.split)
-            {
-                return Decision.SPLIT;
-            }
-            else if(dealer != 11 && this.dd)
-            {
-                return Decision.SPLIT;
-            }
-            else if(dealer >= 4 && dealer <= 6 && !this.dd)
-            {
-                return Decision.PASS;
-            }
-            else return Decision.HIT;
-        }
-        else if (this.suma == 11)
-        {
-            if(this.dd && dealer <= 9)
-            {
-                return Decision.DOUBLE;
-            }
-            else return Decision.HIT;
-        }
-        else if (this.suma == 10)
-        {
-            if(this.dd && dealer <= 9)
-            {
-                return Decision.DOUBLE;
-            }
-            else return Decision.HIT;
-        }
-        else if (this.suma == 9)
-        {
-            if(this.dd && dealer >= 3 && dealer <= 6)
-            {
-                return Decision.DOUBLE;
-            }
-            else return Decision.HIT;
-        }
-        else return Decision.HIT;   
-    }
-
-    @Override
-    public void addCarta(Carta carta, int esSplit) 
-    {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void split() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void quemarCartas() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

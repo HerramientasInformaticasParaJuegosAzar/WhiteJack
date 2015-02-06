@@ -16,14 +16,14 @@
  */
 package casinoblackjack.negocio.mesa.ui;
 
-import casinoblackjack.negocio.cartas.Decision;
-import casinoblackjack.negocio.juego.Juego;
 import casinoblackjack.negocio.jugador.SA.SAJugador;
+import casinoblackjack.negocio.jugador.SA.imp.SAJugadorImp;
+import casinoblackjack.negocio.jugador.estrategias.Estrategia;
 import casinoblackjack.negocio.mesa.Mesa;
 import casinoblackjack.negocio.mesa.obs.Observador;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Arrays;
+import javax.swing.DefaultComboBoxModel;
 
 /**
  *
@@ -31,7 +31,7 @@ import java.util.logging.Logger;
  */
 public class MainWindow extends javax.swing.JFrame implements Observador {
     
-    Mesa mesa;
+    private Mesa mesa;
 
     public void setMesa(Mesa mesa) {
         this.mesa = mesa;
@@ -39,7 +39,7 @@ public class MainWindow extends javax.swing.JFrame implements Observador {
     /**
      * Creates new form MainWindow
      */
-    public MainWindow(Juego juego) {
+    public MainWindow() {
         initComponents();
     }
 
@@ -68,6 +68,8 @@ public class MainWindow extends javax.swing.JFrame implements Observador {
         jLabel10 = new javax.swing.JLabel();
         jTextField4 = new javax.swing.JTextField();
         botonJugar = new javax.swing.JButton();
+        jLabel11 = new javax.swing.JLabel();
+        spinnerJugadores = new javax.swing.JSpinner();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextPane1 = new javax.swing.JTextPane();
@@ -81,6 +83,8 @@ public class MainWindow extends javax.swing.JFrame implements Observador {
         logtext = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         logArea = new javax.swing.JTextPane();
+        jLabel12 = new javax.swing.JLabel();
+        labelApuesta = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("WhiteJack (BlackJack Analyzer)");
@@ -175,27 +179,36 @@ public class MainWindow extends javax.swing.JFrame implements Observador {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel10)
                     .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
                 .addComponent(botonJugar, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
+
+        jLabel11.setText("Numero de Jugadores en la mesa:");
+
+        spinnerJugadores.setModel(new javax.swing.SpinnerNumberModel(1, 0, 6, 1));
+        spinnerJugadores.setVerifyInputWhenFocusTarget(false);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(comboBoxJugada, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jSlider1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(comboBoxJugada, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jSlider1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel4)
                             .addComponent(jLabel5)
                             .addComponent(jLabel6))
-                        .addGap(0, 211, Short.MAX_VALUE))
-                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel11)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(spinnerJugadores)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -209,7 +222,11 @@ public class MainWindow extends javax.swing.JFrame implements Observador {
                 .addComponent(jLabel5)
                 .addGap(18, 18, 18)
                 .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(67, 67, 67)
+                .addGap(32, 32, 32)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel11)
+                    .addComponent(spinnerJugadores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
                 .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -233,6 +250,11 @@ public class MainWindow extends javax.swing.JFrame implements Observador {
         logtext.setText("Log");
 
         jScrollPane3.setViewportView(logArea);
+
+        jLabel12.setText("Apuesta de la estrategia:");
+
+        labelApuesta.setText("0");
+        labelApuesta.setToolTipText("");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -258,7 +280,11 @@ public class MainWindow extends javax.swing.JFrame implements Observador {
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel3)
                                     .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 177, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addComponent(logtext))
+                            .addComponent(logtext)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(jLabel12)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(labelApuesta)))
                         .addGap(0, 41, Short.MAX_VALUE))))
         );
         jPanel2Layout.setVerticalGroup(
@@ -274,10 +300,14 @@ public class MainWindow extends javax.swing.JFrame implements Observador {
                     .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
                     .addComponent(jScrollPane1)
                     .addComponent(jScrollPane2))
-                .addGap(59, 59, 59)
+                .addGap(27, 27, 27)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel12)
+                    .addComponent(labelApuesta))
+                .addGap(18, 18, 18)
                 .addComponent(logtext)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane3)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 214, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -315,6 +345,8 @@ public class MainWindow extends javax.swing.JFrame implements Observador {
     private javax.swing.JComboBox comboBoxJugada;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -338,8 +370,10 @@ public class MainWindow extends javax.swing.JFrame implements Observador {
     private javax.swing.JTextPane jTextPane1;
     private javax.swing.JTextPane jTextPane2;
     private javax.swing.JTextPane jTextPane4;
+    private javax.swing.JLabel labelApuesta;
     public static javax.swing.JTextPane logArea;
     private javax.swing.JLabel logtext;
+    private javax.swing.JSpinner spinnerJugadores;
     // End of variables declaration//GEN-END:variables
 
 
@@ -348,15 +382,43 @@ public class MainWindow extends javax.swing.JFrame implements Observador {
     }
 
     private void jugar() {
+        configurarMesa();
         this.mesa.jugarTurno();
     }
 
+    private int apuestaEstrategia;
+    
     @Override
     public void actualizarApuestas() {
-      
+        apuestaEstrategia = mesa.getApuestaJugadorPrincipal();
+        labelApuesta.setText(apuestaEstrategia+"");
     }
+    
     @Override
     public void actualizarCartas() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("DIOOOOOOOOs \n"+Arrays.toString(mesa.getCartasEnMesa().toArray()));
+    }
+
+    private void configurarMesa() {
+        añadirJugadores();
+        añadirEstrategia();
+    }
+
+    private void añadirJugadores() {
+        for (int i = 0; i < (int) spinnerJugadores.getValue(); i++) {
+            this.mesa.addPlayer(new SAJugadorImp());
+        }
+    }
+
+    private void añadirEstrategia() {
+        this.mesa.addMainPlayer((SAJugador) comboBoxJugada.getModel().getSelectedItem());
+    }
+    
+    public void setPosiblesEstrategias(ArrayList<Estrategia> estrategias){
+        DefaultComboBoxModel<Estrategia> model = new  DefaultComboBoxModel();
+        for(Estrategia estrategia: estrategias){
+            model.addElement(estrategia);
+        }
+        this.comboBoxJugada.setModel(model);
     }
 }

@@ -16,9 +16,14 @@
  */
 package casinoblackjack.negocio.juego;
 
+import casinoblackjack.negocio.jugador.estrategias.imp.Viktor;
 import casinoblackjack.negocio.jugador.SA.SAJugador;
+import casinoblackjack.negocio.jugador.SA.imp.SAJugadorImp;
+import casinoblackjack.negocio.jugador.estrategias.Estrategia;
 import casinoblackjack.negocio.mesa.Mesa;
 import casinoblackjack.negocio.mesa.ui.MainWindow;
+import java.awt.Event;
+import java.awt.EventQueue;
 import java.util.ArrayList;
 
 /**
@@ -28,30 +33,28 @@ import java.util.ArrayList;
 public class Juego{
 
     private Mesa mesa;
-
-    private SAJugador jugadorUI;
-
-    ArrayList<SAJugador> jugadores;
-
-    public ArrayList<SAJugador> getJugadores() {
-        return jugadores;
-    }
-
+    
     public Juego(){
         this.mesa = new Mesa(2);
-        jugadores = this.crearJugadores();
+        EventQueue.invokeLater(new Runnable() {
+        public void run() {
+                MainWindow mw = new MainWindow();
+                mesa.setObservador(mw);
+                mw.setVisible(true);
+                mw.setMesa(mesa);
+                mw.setPosiblesEstrategias(crearPosiblesEstrategias());
+            }
+        });
     }
 
     public Mesa getMesa() {
         return mesa;
     }
-
-    public SAJugador getJugadorUI() {
-        return jugadorUI;
+    
+    public ArrayList<Estrategia> crearPosiblesEstrategias(){
+        ArrayList<Estrategia> e = new ArrayList<>();
+        e.add(new Viktor());
+        return e;
     }
-
-    private ArrayList<SAJugador> crearJugadores() {
-        return null;
-    }
-
+    
 }

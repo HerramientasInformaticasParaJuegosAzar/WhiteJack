@@ -20,6 +20,7 @@ package casinoblackjack.negocio.jugador.SA;
 import casinoblackjack.negocio.cartas.Carta;
 import casinoblackjack.negocio.cartas.Decision;
 import casinoblackjack.negocio.jugador.Jugador;
+import casinoblackjack.negocio.jugador.estrategias.Estrategia;
 import java.util.ArrayList;
 
 /**
@@ -33,17 +34,59 @@ public interface SAJugador
     public boolean bajaJugador(Integer id);
     public Jugador mostrarJugador(Integer id);
     
-    public abstract void addCarta(Carta carta);
+    
+    /*
+    Configura una estrategia para el jugador
+    */
+    public abstract void setEstrategia(Estrategia estrategia);
+    
+    /*
+    Devuelve las cartas de un jugador, de su montón número nSplit (0,1,2...)
+    */
+    public abstract ArrayList<Carta> getCartas(int nSplit);
+    
+    /*
+    Devuelve todas las cartas de un jugador
+    */
     public abstract ArrayList<Carta> getCartas();
+    
+    /*
+    Devuelve la ID del jugador
+    */
     public abstract int getIDJugador();
 
+    /*
+    Devuelve la apuesta del jugador
+    */
     public abstract int apostar(int apuestaMin, int apuestaMax);
+    
+    /*
+    Devuelve la decision del jugador
+    */
+    public abstract Decision makeDecision(Carta cartaDealer, ArrayList<Carta> cartasEnMesa, int nSplit);
 
-    public abstract Decision makeDecision(Carta cartaDealer, ArrayList<Carta> cartasEnMesa);
+    /*
+    Añade una carta a uno de los montones del jugador (0,1,2...)
+    */
+    public abstract void addCarta(Carta carta, int nSplit);
 
-    public abstract void addCarta(Carta carta, int esSplit);
+    /*
+    Splitea el monton nSplit(0,1,2...) de un jugador
+    */
+    public void split(int nSplit);
 
-    public void split();
-
+    /*
+    Quema las cartas del jugador, eliminando las cartas que tiene
+    */
     public void quemarCartas();
+    
+    /*
+    Devuelve el número de montones que tiene un jugador. P ej, si ha hecho split 2 times, devuelve 3
+    */
+    public int numSplits();
+    
+    /*
+    Permite al jugador observar todas las cartas que hay en la mesa después de que el dealer haga su jugada
+    */
+    public void verCartasEnMesa(ArrayList<Carta> cartasEnMesa);
 }

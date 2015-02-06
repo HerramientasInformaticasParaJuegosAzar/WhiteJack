@@ -25,9 +25,9 @@ public class Carta
 
     public int getValor() 
     {
-        if(this.valor.ordinal()==1) return 11;
-        if(this.valor.ordinal()>10) return 10;
-        return this.valor.ordinal();
+        if(this.valor.ordinal()==0) return 11;
+        if(this.valor.ordinal()>9) return 10;
+        return this.valor.ordinal() + 1;
     }
 
     public void setValor(Valor valor) 

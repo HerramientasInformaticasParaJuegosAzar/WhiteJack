@@ -438,6 +438,7 @@ public class MainWindow extends Thread implements Observador {
 	protected void simular() {
 		int numSimulaciones = sliderSimulaciones.getValue();
 		addEstrategia();
+                progressBar.setValue(0);
 		new Simulacion(mesa, progressBar, numSimulaciones).start();
 	}
 

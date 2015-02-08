@@ -16,11 +16,18 @@ import java.util.ArrayList;
  */
 public class Ivan extends Estrategia{
     
-    int numDieces;
+    
+     int numDieces;
+     
+    public Ivan (){
+        this.numDieces = 0;
+    }
+   
     
     public int apostar(int apuestaMin, int apuestaMax)
     {
-        return (apuestaMin+1) * (this.numDieces/2);
+     
+        return apuestaMin + apuestaMin*(this.numDieces/2);
     } 
     
     public void contarCartas(ArrayList<Carta> cartas)
@@ -33,6 +40,7 @@ public class Ivan extends Estrategia{
     
     public Decision makeDecision(Carta cartaDealer, ArrayList<Carta> cartasEnMesa, ArrayList<Carta> mano)
     {
+        contarCartas(cartasEnMesa);
         int dealer = cartaDealer.getValor();
         int suma = 0;
         boolean debil = false;
@@ -59,13 +67,13 @@ public class Ivan extends Estrategia{
         
         if (suma >= 19) 
         {
-            return Decision.HIT;
+            return Decision.STAND;
         }
         else if (suma == 18)
         {
             if(dealer >= 2 && dealer <= 9 && dealer != 7 && split)
             {
-                return Decision.HIT;
+                return Decision.SPLIT;
             }
             else if(dealer >= 9 && dealer <= 11 && debil)
             {
@@ -73,37 +81,25 @@ public class Ivan extends Estrategia{
             }
             else if(dealer >= 3 && dealer <= 6 && dd)
             {
-                return Decision.HIT;
+                return Decision.DOUBLE;
             }
-            else return Decision.HIT;
+            else return Decision.STAND;
         }
         else if(suma == 17)
         {
             if(dealer >= 3 && dealer <= 6 && dd)
             {
-                return Decision.HIT;
+                return Decision.DOUBLE;
             }
             else if (debil)
             {
                 return Decision.HIT;
             }
-            else return Decision.HIT;
+            else return Decision.STAND;
         }
         else if(suma == 16)
         {
-            if(dealer >= 2 && dealer <= 9 && split)
-            {
-                return Decision.HIT;
-            }
-            else if(dealer >= 4 && dealer <= 6 && dd)
-            {
-                return Decision.HIT;
-            }
-            else if(dealer >= 7 && !debil || debil)
-            {
-                return Decision.HIT;
-            }
-            else return Decision.STAND;
+             return Decision.STAND;
         }
         else if (suma == 15)
         {
@@ -187,8 +183,6 @@ public class Ivan extends Estrategia{
         }
         else return Decision.HIT;
     }
-    
-    
     
     
 }

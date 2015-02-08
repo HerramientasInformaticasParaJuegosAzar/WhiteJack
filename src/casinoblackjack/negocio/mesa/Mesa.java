@@ -426,7 +426,7 @@ public class Mesa extends Observable {
                 valorManoJugador = calcularValor(jugadorPrincipal, 0);
                     if (valorManoJugador == 21) {
                         darDineroJugadorPrincipal(2.5);
-                    } else if (valorManoDealer <= valorManoJugador) {
+                    } else if (valorManoDealer <= valorManoJugador && valorManoJugador <21) {
                         darDineroJugadorPrincipal(2.5);
                     } else {
                         darDineroJugadorPrincipal( 0);
@@ -452,7 +452,18 @@ public class Mesa extends Observable {
             }
             actualizarCartas();
         }
-    }
+        
+        for(int j = 0; j < jugadorPrincipal.numSplits();j++)
+            if (calcularValor(jugadorPrincipal, j) ==21) {
+            	log("El jugador "+jugadorPrincipal.getIdjugadores()+" empata con el dealer");
+                darDinero(jugadorPrincipal, 1);
+                
+            } else {
+                apuestaJugadorPrincipal = 0;
+            }
+            actualizarCartas();
+        }
+ 
 
     /*   darDinero(SAJugador jugador, double d) 
      *
@@ -469,7 +480,10 @@ public class Mesa extends Observable {
         	log("El jugador "+jugador.getIdjugadores()+" ha ganado esta partida");
             int cuentaAIncrementar = FactoriaSA.getInstancia().obtenerSABanca().obtenerCuentasJugador(jugador.getIdjugadores()).get(0);
             int index = indexOfArray(jugadores,jugador);
-            FactoriaSA.getInstancia().obtenerSABanca().incrementarSaldo(cuentaAIncrementar, multiplicador*apuestas.get(index));
+            if(index >= 0)
+                FactoriaSA.getInstancia().obtenerSABanca().incrementarSaldo(cuentaAIncrementar, multiplicador*apuestas.get(index));
+            else
+                FactoriaSA.getInstancia().obtenerSABanca().incrementarSaldo(cuentaAIncrementar, multiplicador*apuestaJugadorPrincipal);
         }
     }
     

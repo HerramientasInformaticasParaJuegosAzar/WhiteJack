@@ -34,11 +34,9 @@ import javax.swing.GroupLayout;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 
-import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
-import java.awt.Toolkit;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -51,7 +49,6 @@ import javax.swing.JButton;
 import javax.swing.JProgressBar;
 import javax.swing.JSeparator;
 
-import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -105,7 +102,7 @@ public class MainWindow extends Thread implements Observador {
 		sliderSimulaciones = new javax.swing.JSlider();
 		jPanel3 = new javax.swing.JPanel();
 		jLabel7 = new javax.swing.JLabel();
-		jTextField1 = new javax.swing.JTextField();
+		tfDinero = new javax.swing.JTextField();
 		jLabel8 = new javax.swing.JLabel();
 		tfGanadas = new javax.swing.JTextField();
 		jLabel9 = new javax.swing.JLabel();
@@ -132,7 +129,7 @@ public class MainWindow extends Thread implements Observador {
 
 		jLabel7.setText("Dinero Ganado:");
 
-		jTextField1.setText("0");
+		tfDinero.setText("0");
 
 		jLabel8.setText("Partidas Ganadas:");
 
@@ -169,7 +166,7 @@ public class MainWindow extends Thread implements Observador {
 														.addGap(14)
 														.addComponent(jLabel7)
 														.addPreferredGap(ComponentPlacement.RELATED)
-														.addComponent(jTextField1, GroupLayout.PREFERRED_SIZE, 191, GroupLayout.PREFERRED_SIZE))
+														.addComponent(tfDinero, GroupLayout.PREFERRED_SIZE, 191, GroupLayout.PREFERRED_SIZE))
 														.addGroup(jPanel3Layout.createParallelGroup(Alignment.LEADING, false)
 																.addGroup(jPanel3Layout.createSequentialGroup()
 																		.addComponent(jLabel10)
@@ -197,7 +194,7 @@ public class MainWindow extends Thread implements Observador {
 						.addPreferredGap(ComponentPlacement.UNRELATED)
 						.addGroup(jPanel3Layout.createParallelGroup(Alignment.BASELINE)
 								.addComponent(jLabel7)
-								.addComponent(jTextField1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addComponent(tfDinero, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 								.addPreferredGap(ComponentPlacement.UNRELATED)
 								.addGroup(jPanel3Layout.createParallelGroup(Alignment.BASELINE)
 										.addComponent(jLabel8)
@@ -425,7 +422,7 @@ public class MainWindow extends Thread implements Observador {
 	private javax.swing.JPanel jPanel2;
 	private javax.swing.JPanel jPanel3;
 	private javax.swing.JSlider sliderSimulaciones;
-	private javax.swing.JTextField jTextField1;
+	private static javax.swing.JTextField tfDinero;
 	private static JTextField tfGanadas;
 	private static JTextField tfPerdidas;
 	private static JTextField tfPercVictorias;
@@ -455,7 +452,16 @@ public class MainWindow extends Thread implements Observador {
                     // Si el jugador Actual automatico no tiene ninguna cuenta, le creamos una por defecto.
                     if (FactoriaSA.getInstancia().obtenerSABanca().obtenerCuentasJugador(jugadorActual.getIdjugadores()).isEmpty())
                         FactoriaSA.getInstancia().obtenerSABanca().altaCuenta(jugadorActual.getIdjugadores(), 500); // Damos de alta una cuenta por defecto con 500 euros.
-		
+                    
+                    // Si tiene cuenta pero no tiene dinero se la reestablecemos.
+                    else
+                    {
+                        int primeraCuenta = FactoriaSA.getInstancia().obtenerSABanca().obtenerCuentasJugador(jugadorActual.getIdjugadores()).get(0);
+                        // Dejamos su cuenta a cero.
+                        FactoriaSA.getInstancia().obtenerSABanca().decrementarSaldo(primeraCuenta, FactoriaSA.getInstancia().obtenerSABanca().consultarSaldoCuenta(primeraCuenta));
+                        // Incrementamos el saldo predeterminado.
+                        FactoriaSA.getInstancia().obtenerSABanca().incrementarSaldo(primeraCuenta, 500);
+                    }
                     jugadores.add(new SAJugadorImp("jugador"+i,"jugadorP"+i,null));
 		}
 		this.mesa.setPlayers(jugadores);
@@ -517,6 +523,13 @@ public class MainWindow extends Thread implements Observador {
 
 	private static int partidasGanadas = 0;
 	private static int partidasPerdidas = 0;
+        private static double dineroGanado = 0;
+        
+        public static void actualizarDinero()
+        {
+            MainWindow.tfDinero.setText(dineroGanado+"");
+            
+        }
 
 	public static void jugadorGana(){
 		partidasGanadas++;
@@ -543,12 +556,43 @@ public class MainWindow extends Thread implements Observador {
 
 	private void addEstrategia() {
 		SAJugadorImp jugador = new SAJugadorImp("jugadorPrincipal","jugadorPrincipalP",null,(Estrategia) comboBoxJugada.getModel().getSelectedItem());
-		this.mesa.addMainPlayer(jugador, false);
+		
+                // Si el jugador principal no tiene cuenta.
+                if (FactoriaSA.getInstancia().obtenerSABanca().obtenerCuentasJugador(jugador.getIdjugadores()).isEmpty())
+                        FactoriaSA.getInstancia().obtenerSABanca().altaCuenta(jugador.getIdjugadores(), 500); // Damos de alta una cuenta por defecto con 500 euros.
+                    
+                    // Si tiene cuenta pero no tiene dinero se la reestablecemos.
+                    else
+                    {
+                        int primeraCuenta = FactoriaSA.getInstancia().obtenerSABanca().obtenerCuentasJugador(jugador.getIdjugadores()).get(0);
+                        // Dejamos su cuenta a cero.
+                        FactoriaSA.getInstancia().obtenerSABanca().decrementarSaldo(primeraCuenta, FactoriaSA.getInstancia().obtenerSABanca().consultarSaldoCuenta(primeraCuenta));
+                        // Incrementamos el saldo predeterminado.
+                        FactoriaSA.getInstancia().obtenerSABanca().incrementarSaldo(primeraCuenta, 500);
+                    }
+                this.mesa.addMainPlayer(jugador, false);
 	}
 	
 	private void addJugadorUI() {
-		if(!mesa.isUIPlayer()){
+		if(!mesa.isUIPlayer())
+                {
+                    
 			JugadorUI jugador = new JugadorUI("jugadorUI","JugadorUIP",null,(Estrategia) comboBoxJugada.getModel().getSelectedItem());
+                        
+                        // Si el jugador principal no tiene cuenta.
+                if (FactoriaSA.getInstancia().obtenerSABanca().obtenerCuentasJugador(jugador.getIdjugadores()).isEmpty())
+                        FactoriaSA.getInstancia().obtenerSABanca().altaCuenta(jugador.getIdjugadores(), 500); // Damos de alta una cuenta por defecto con 500 euros.
+                    
+                    // Si tiene cuenta pero no tiene dinero se la reestablecemos.
+                    else
+                    {
+                        int primeraCuenta = FactoriaSA.getInstancia().obtenerSABanca().obtenerCuentasJugador(jugador.getIdjugadores()).get(0);
+                        // Dejamos su cuenta a cero.
+                        FactoriaSA.getInstancia().obtenerSABanca().decrementarSaldo(primeraCuenta, FactoriaSA.getInstancia().obtenerSABanca().consultarSaldoCuenta(primeraCuenta));
+                        // Incrementamos el saldo predeterminado.
+                        FactoriaSA.getInstancia().obtenerSABanca().incrementarSaldo(primeraCuenta, 500);
+                    }
+                
 			this.mesa.addMainPlayer(jugador, true);
 		}
 	}

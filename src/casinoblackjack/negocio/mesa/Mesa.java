@@ -37,7 +37,7 @@ public class Mesa extends Observable {
     
     private Barajeador baraja;
 
-    private int turno;
+    private ArrayList<Integer> turno;
 
     private ArrayList<Carta> cartasQuemadas = new ArrayList<>();
 
@@ -59,6 +59,7 @@ public class Mesa extends Observable {
         this.jugadores =  new ArrayList<>();
         this.apuestas = new ArrayList<>();
         this.banca = new  SABancaImp();
+        this.turno = new ArrayList<>();
     }
     
     public Mesa(int barajas, int apuestaMin, int apuestaMax) {
@@ -66,6 +67,7 @@ public class Mesa extends Observable {
         this.baraja = new Barajeador(barajas);
         this.apuestaMin = apuestaMin;
         this.apuestaMax = apuestaMax;
+        this.turno = new ArrayList<>();
     }
     
     public boolean isUIPlayer(){
@@ -142,22 +144,28 @@ public class Mesa extends Observable {
      *       para ello le pregunta a la banca por sus cuentas 
      *       y luego comprueba si con alguna de ellas puede apostar.
      */
-    private boolean puedeApostar(SAJugador jugador) {
+    private int puedeApostar(SAJugador jugador) 
+    {
         //busca la apuesta del jugador 
-        return true;
-        /*int indexJugador = this.jugadores.indexOf((SAJugador) jugador);
-        int posibleApuesta = this.apuestas.get(indexJugador);
-        Jugador aux  = new Jugador();
-        aux.setIdjugadores(jugador.getIDJugador());
-        ArrayList<Integer> cuentas = banca.obtenerCuentasJugador(aux);
-        for (Integer numCuenta : cuentas) {
-            //this.banca.consultarSaldoCuenta(numCuenta)
-            if (this.banca.consultarSaldoCuenta(1) >= posibleApuesta) {
-                this.apuestas.set(indexJugador, posibleApuesta * 2);
-                return true;
-            }
-        }
-        return false;*/
+      
+        int indexJugador = this.jugadores.indexOf((SAJugador) jugador);
+        int posibleApuesta;
+        
+        if (indexJugador < 0)
+            posibleApuesta = apuestaJugadorPrincipal;
+        else
+            posibleApuesta = this.apuestas.get(indexJugador);
+        
+        int idCuentaParaApostar = -1;
+        
+        ArrayList<Integer> cuentas = banca.obtenerCuentasJugador(jugador.getIdjugadores());
+        
+        for (Integer cuenta : cuentas) 
+            if (FactoriaSA.getInstancia().obtenerSABanca().consultarSaldoCuenta(cuenta) - posibleApuesta*2 >= 0) 
+                idCuentaParaApostar = cuenta;
+        
+       
+        return idCuentaParaApostar;
     }
 
     /*   recogerApuestas()
@@ -172,10 +180,14 @@ public class Mesa extends Observable {
             for (int i = 0; i < jugadores.size(); i++) 
             {
                 posibleApuesta = this.jugadores.get(i).apostar(this.apuestaMin, this.apuestaMax);
-                if (puedeApostar(this.jugadores.get(i), posibleApuesta) >= 0) 
+                int cuentaDondeApostar = puedeApostar(this.jugadores.get(i), posibleApuesta);
+                
+                if (cuentaDondeApostar >= 0) 
                 {
                     this.apuestas.set(i, posibleApuesta);
-                    log("El jugador "+i+" ha realizado una apuesta de "+posibleApuesta);
+                    log("El jugador " + jugadores.get(i).getIdjugadores() + " ha realizado una apuesta de "+posibleApuesta);
+                    FactoriaSA.getInstancia().obtenerSABanca().decrementarSaldo(cuentaDondeApostar, posibleApuesta);
+                    
                 } else /*
                  * Si el jugador no tiene dinero para apostar, su apuesta será 0
                  * si el jugador no apuesta no podrá jugar este turno.
@@ -186,10 +198,16 @@ public class Mesa extends Observable {
             }
             posibleApuesta = this.jugadorPrincipal.apostar(apuestaMin, apuestaMax);
             
-            if (puedeApostar(this.jugadorPrincipal, posibleApuesta) >= 0) 
+            // Si el jugador puede apostar en alguna cuenta la obtenemos.
+            int cuentaDondeApostar = puedeApostar(this.jugadorPrincipal, posibleApuesta);
+            
+            if (cuentaDondeApostar >= 0) 
             {
                 apuestaJugadorPrincipal = posibleApuesta;
-                log("El jugador principal ha realizado una apuesta de "+posibleApuesta);
+                log("El jugador principal ha realizado una apuesta de "+ posibleApuesta);
+                // Decrementamos su saldo.
+                FactoriaSA.getInstancia().obtenerSABanca().decrementarSaldo(cuentaDondeApostar, posibleApuesta);
+                        
             }
             else apuestaJugadorPrincipal = 0;
         }
@@ -204,7 +222,7 @@ public class Mesa extends Observable {
     {
         for (int i = 0; i < jugadores.size(); i++) {
             if (this.apuestas.get(i) > 0) {
-            	log("---Turno de decidir del jugador "+i+"---");
+            	log("---Turno de decidir del jugador "+ jugadores.get(i).getIdjugadores() + " ---");
                 this.jugarTurno(jugadores.get(i), true, 0);
             }
         }
@@ -234,11 +252,12 @@ public class Mesa extends Observable {
                 break;
             case DOUBLE:
                 if (esPrimerTurno) {
-                	
+                    
                     this.jugadorDouble(jugador, esSplit);
                 }
                 break;
             case SPLIT:
+
                  this.jugadorSplit(jugador, esSplit);
                 
                 break;
@@ -280,7 +299,7 @@ public class Mesa extends Observable {
             this.jugarTurno(jugador, false, esSplit);
         }
         else{
-        	log("El jugador hace se ha pasado");
+        	log("El jugador se ha pasado");
         }
     }
 
@@ -291,11 +310,28 @@ public class Mesa extends Observable {
      *  luego deja de pedir cartas
      */
     private void jugadorDouble(SAJugador jugador, int esSplit) {
-        if (puedeApostar(jugador)) {
-        	log("El jugador hace double");
-            jugador.addCarta(this.baraja.obtenerCarta(), esSplit);
-            actualizarCartas();
-        }
+        
+                int cuentaDondeApostar = puedeApostar(jugador);
+                
+                if (cuentaDondeApostar >= 0) 
+                {
+                    log("El jugador hace double");
+                    jugador.addCarta(this.baraja.obtenerCarta(), esSplit);
+                    actualizarCartas();
+            
+                    // Creo que aqui hay que doblar la apuesta y volcar en la base de datos REVISAR.
+                    int index = indexOfArray(jugadores,jugador);
+                    
+                    double apuesta;
+                    
+                    if (index < 0)
+                        apuesta = apuestaJugadorPrincipal;
+                    else
+                        apuesta = this.apuestas.get(index);
+                    
+                    FactoriaSA.getInstancia().obtenerSABanca().decrementarSaldo(cuentaDondeApostar, apuesta);
+                    
+                }
     }
 
     /*   jugadorSplit(SAJugador jugador)
@@ -303,13 +339,32 @@ public class Mesa extends Observable {
      *   comprueba que puede hacer split y que puede doblar la apuesta
      */
     private void jugadorSplit(SAJugador jugador, int esSplit) {
-        if (puedeApostar(jugador)) {
-            if (puedeHacerSplit(jugador, esSplit)) {
+        
+        int cuentaDondeApostar = puedeApostar(jugador);
+                
+        if (cuentaDondeApostar >= 0) 
+        {
+            if (puedeHacerSplit(jugador, esSplit)) 
+            {
             	log("El jugador hace split");
                 jugador.split(esSplit);
                 actualizarCartas();
                 this.jugarTurno(jugador, false, 0);
                 this.jugarTurno(jugador, false, 1);
+                
+                
+                // Comprobar si es correcto.
+                
+                int index = indexOfArray(jugadores,jugador);
+                    
+                    double apuesta;
+                    
+                    if (index < 0)
+                        apuesta = apuestaJugadorPrincipal;
+                    else
+                        apuesta = this.apuestas.get(index);
+                    
+                    FactoriaSA.getInstancia().obtenerSABanca().decrementarSaldo(cuentaDondeApostar, apuesta);
             }
         }
     }
@@ -389,7 +444,7 @@ public class Mesa extends Observable {
         for (int i = 0; i < apuestas.size(); i++) {
             for(int j = 0; j < jugadores.get(i).numSplits();j++)
             if (calcularValor(jugadores.get(i), j) ==21) {
-            	log("El jugador "+i+" hace empata con el dealer");
+            	log("El jugador "+jugadores.get(i).getIdjugadores()+" empata con el dealer");
                 darDinero(jugadores.get(i), 1);
                 
             } else {
@@ -412,8 +467,9 @@ public class Mesa extends Observable {
             apuestas.set(jugadores.indexOf(jugador), 0);
         } else {
         	log("El jugador "+jugador.getIdjugadores()+" ha ganado esta partida");
-            int indexJugador = this.jugadores.indexOf((SAJugador) jugador);
-            //banca.incrementarSaldo(1, 1);
+            int cuentaAIncrementar = FactoriaSA.getInstancia().obtenerSABanca().obtenerCuentasJugador(jugador.getIdjugadores()).get(0);
+            int index = indexOfArray(jugadores,jugador);
+            FactoriaSA.getInstancia().obtenerSABanca().incrementarSaldo(cuentaAIncrementar, multiplicador*apuestas.get(index));
         }
     }
     
@@ -425,8 +481,20 @@ public class Mesa extends Observable {
         } else {
         	MainWindow.jugadorGana();
         	log("El jugador principal ha ganado esta partida");
-            //banca.incrementarSaldo(1, multiplicador*apuestaJugadorPrincipal);
+            int cuentaAIncrementar = FactoriaSA.getInstancia().obtenerSABanca().obtenerCuentasJugador(jugadorPrincipal.getIdjugadores()).get(0);
+     
+            FactoriaSA.getInstancia().obtenerSABanca().incrementarSaldo(cuentaAIncrementar, multiplicador*apuestaJugadorPrincipal);
         }
+    }
+    
+    private int indexOfArray(ArrayList<SAJugador> lista, SAJugador jugador)
+    {
+        int index = -1;
+        for(int i = 0; i < lista.size(); i++)
+            if (lista.get(i).getIdjugadores() == jugador.getIdjugadores())
+                index = i;
+        
+        return index;
     }
 
     private void limpiarMesa() {

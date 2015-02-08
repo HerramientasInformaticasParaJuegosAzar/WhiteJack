@@ -110,7 +110,7 @@ public class SABancaImp implements SABanca
             {
                 
                 incremento += rs.getDouble("saldo");
-                st.executeUpdate("UPDATE cuentas SET saldo = " + incremento);          
+                st.executeUpdate("UPDATE cuentas SET saldo = " + incremento+ " WHERE idcuentas = "+idCuenta);          
             }
             else
             {
@@ -146,7 +146,7 @@ public class SABancaImp implements SABanca
             {
                 decremento = rs.getDouble("saldo") - decremento;
                 
-                st.executeUpdate("UPDATE cuentas SET saldo = " + decremento);          
+                st.executeUpdate("UPDATE cuentas SET saldo = " + decremento+ " WHERE idcuentas = "+idCuenta);          
             }
             else
             {

@@ -10,14 +10,19 @@ import java.util.ArrayList;
 import casinoblackjack.negocio.cartas.Carta;
 import casinoblackjack.negocio.jugador.Decision;
 import casinoblackjack.negocio.jugador.SA.imp.SAJugadorImp;
+import java.util.Date;
 
 
 
 public class Dealer extends SAJugadorImp{
 
+    public Dealer(String usuario, String password, Date fechaRegistro) 
+    {
+        super(usuario, password, fechaRegistro);
+    }
 
-	public Dealer(){
-	}
+
+	
 	
     private int calcularValor() {
         ArrayList<Carta> cartas = this.getCartas();

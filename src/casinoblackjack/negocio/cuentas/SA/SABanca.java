@@ -5,8 +5,6 @@
  */
 package casinoblackjack.negocio.cuentas.SA;
 
-import casinoblackjack.negocio.cuentas.Cuenta;
-import casinoblackjack.negocio.jugador.Jugador;
 import java.util.ArrayList;
 
 /**
@@ -15,11 +13,9 @@ import java.util.ArrayList;
  */
 public interface SABanca 
 {
-    public int altaCuenta(Cuenta cuenta);
+    public boolean altaCuenta(int idJugador, double dinero);
     public double consultarSaldoCuenta(int idCuenta);
-    public double consultarSaldoCuentas(int idJugador);
     public boolean incrementarSaldo(int idCuenta, double incremento);
     public boolean decrementarSaldo(int idCuenta, double decremento);
-    public boolean bajaCuenta(int idCuenta);
-    public ArrayList<Integer> obtenerCuentasJugador(Jugador jugador);
+    public ArrayList<Integer> obtenerCuentasJugador(int idJugador);
 }

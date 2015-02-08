@@ -17,22 +17,103 @@
 
 package casinoblackjack.negocio.jugador.SA;
 
+import casinoblackjack.negocio.Conexion.Conexion;
 import casinoblackjack.negocio.cartas.Carta;
 import casinoblackjack.negocio.jugador.Decision;
-import casinoblackjack.negocio.jugador.Jugador;
+import casinoblackjack.negocio.jugador.SA.imp.SAJugadorImp;
 import casinoblackjack.negocio.jugador.estrategias.Estrategia;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.LockModeType;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
+import javax.persistence.Persistence;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.xml.bind.annotation.XmlRootElement;
 
-/**
- *
- * @author usuario_local
- */
-public interface SAJugador 
+
+
+public abstract class SAJugador 
 {
-    public int altaJugador(Jugador jugador);
-    public boolean modificarJugador(Jugador jugador);
-    public boolean bajaJugador(Integer id);
-    public Jugador mostrarJugador(Integer id);
+        
+        
+        private boolean activo;
+        
+        private Integer idjugadores;
+       
+        private String usuario;
+       
+        private String password;
+       
+        private Date fechaRegistro;
+    
+        public SAJugador(String usuario, String password, Date fechaRegistro) 
+        {
+            this.usuario = usuario;
+            this.password = password;
+            this.fechaRegistro = fechaRegistro;
+            this.activo = true;
+            altaJugador();
+        }
+
+    
+    public final boolean altaJugador() 
+    {   
+        boolean correcto = true;
+        
+        Connection conexion = Conexion.getInstancia();
+        
+        try
+        {
+            Statement st = conexion.createStatement();
+        
+            ResultSet rs = st.executeQuery("SELECT * FROM jugadores WHERE usuario = '" + this.usuario+"'");
+        
+            // ID, user, pass, fecha, activo
+            // Si existe el jugador
+            if (rs.next())
+            {
+                // 
+                if (rs.getBoolean("activo") && rs.getString("password").equalsIgnoreCase(password))
+                {
+                    this.idjugadores = rs.getInt("idJugadores");
+                }
+                else
+                {
+                    correcto = false;
+                    System.err.println("La password del usuario introducido no coincide o esta desactivado.");
+                }
+                
+            }
+            else
+            {
+                st.executeUpdate("INSERT INTO jugadores(usuario,password,fechaRegistro,activo) VALUES ('"+usuario+"','"+password+"',"+this.fechaRegistro+","+this.activo+")");
+                rs = st.executeQuery("SELECT * FROM jugadores WHERE usuario = '" + this.usuario+"'");
+                if (rs.next())
+                    this.idjugadores = rs.getInt("idJugadores");
+                
+            }
+        
+        }
+        catch(Exception e)
+        {
+           e.printStackTrace();
+        }
+        
+        
+        return correcto;
+    }
+
+ 
     
     
     /*
@@ -51,11 +132,6 @@ public interface SAJugador
     public abstract ArrayList<Carta> getCartas();
     
     /*
-    Devuelve la ID del jugador
-    */
-    public abstract int getIDJugador();
-
-    /*
     Devuelve la apuesta del jugador
     */
     public abstract int apostar(int apuestaMin, int apuestaMax);
@@ -73,20 +149,73 @@ public interface SAJugador
     /*
     Splitea el monton nSplit(0,1,2...) de un jugador
     */
-    public void split(int nSplit);
+    public abstract void split(int nSplit);
 
     /*
     Quema las cartas del jugador, eliminando las cartas que tiene
     */
-    public void quemarCartas();
+    public abstract void quemarCartas();
     
     /*
     Devuelve el número de montones que tiene un jugador. P ej, si ha hecho split 2 times, devuelve 3
     */
-    public int numSplits();
+    public abstract int numSplits();
     
     /*
     Permite al jugador observar todas las cartas que hay en la mesa después de que el dealer haga su jugada
     */
-    public void verCartasEnMesa(ArrayList<Carta> cartasEnMesa);
+    public abstract void verCartasEnMesa(ArrayList<Carta> cartasEnMesa);
+    
+    
+    
+    
+    public final Integer getIdjugadores() 
+    {
+        return idjugadores;
+    }
+
+    public final void setIdjugadores(Integer idjugadores) 
+    {
+        this.idjugadores = idjugadores;
+    }
+
+    public final String getUsuario() 
+    {
+        return usuario;
+    }
+
+    public final void setUsuario(String usuario) 
+    {
+        this.usuario = usuario;
+    }
+
+    public final String getPassword() 
+    {
+        return password;
+    }
+
+    public final void setPassword(String password)
+    {
+        this.password = password;
+    }
+
+    public final Date getFechaRegistro() 
+    {
+        return fechaRegistro;
+    }
+
+    public final void setFechaRegistro(Date fechaRegistro) 
+    {
+        this.fechaRegistro = fechaRegistro;
+    }
+     
+    public final boolean getActivo() 
+    {
+        return activo;
+    }
+
+    public final void setActivo(boolean activo) 
+    {
+        this.activo = activo;
+    }
 }

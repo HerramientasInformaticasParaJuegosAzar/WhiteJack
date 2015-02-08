@@ -9,13 +9,14 @@ import casinoblackjack.negocio.jugador.Decision;
 import casinoblackjack.negocio.jugador.SA.imp.SAJugadorImp;
 import casinoblackjack.negocio.jugador.estrategias.Estrategia;
 import casinoblackjack.negocio.mesa.ui.MainWindow;
+import java.util.Date;
 
 public class JugadorUI extends SAJugadorImp {
 	
 	private Estrategia estrategia;
 
-	public JugadorUI(Estrategia e){
-		super();
+	public JugadorUI(String usuario, String password, Date fechaRegistro, Estrategia e){
+		super(usuario,password,fechaRegistro,e);
 		this.estrategia=e;
 	}
 	

@@ -17,234 +17,52 @@
 
 package casinoblackjack.negocio.jugador.SA.imp;
 
-import casinoblackjack.negocio.EntityFactory.EntityFactorySingleton;
+
 import casinoblackjack.negocio.cartas.Carta;
 import casinoblackjack.negocio.jugador.Decision;
-import casinoblackjack.negocio.cartas.barajeador.Barajeador;
-import casinoblackjack.negocio.cartas.enumerados.Palo;
-import casinoblackjack.negocio.cartas.enumerados.Valor;
 import casinoblackjack.negocio.jugador.estrategias.Estrategia;
-import casinoblackjack.negocio.jugador.Jugador;
 import casinoblackjack.negocio.jugador.SA.SAJugador;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.LockModeType;
-import javax.persistence.Persistence;
+
 
 
 /**
  *
  * @author usuario_local
  */
-public class SAJugadorImp implements SAJugador 
+
+public class SAJugadorImp extends SAJugador 
 {
-    ArrayList<ArrayList<Carta>> cartas;
+    ArrayList<ArrayList<Carta>> cartas = new ArrayList<>();
     Estrategia estrategia;
     
-    
-    public SAJugadorImp()
+    public SAJugadorImp(String usuario, String password, Date fechaRegistro, Estrategia est) 
     {
-        this.cartas = new ArrayList<ArrayList<Carta>>();
-        this.estrategia = new Estrategia();
-    }
-    
-    public SAJugadorImp(Estrategia est)
-    {
-        this.cartas = new ArrayList<ArrayList<Carta>>();
+        super(usuario,password,fechaRegistro);
         this.estrategia = est;
     }
     
-    @Override
-    public int altaJugador(Jugador jugador) 
+    public SAJugadorImp(String usuario, String password, Date fechaRegistro) 
     {
-        jugador.setIdjugadores(-1);
-        
-        EntityManager em = null;
-        EntityManagerFactory ef = null;
-        try 
-        {
-            ef = Persistence.createEntityManagerFactory("WhiteJackPU");
-            em = ef.createEntityManager();
-            
-            em.getTransaction().begin();
-            
-            Jugador jugadorAux = null;
-            
-            List results = em.createNamedQuery("Jugador.findByIdUsuario")
-            .setParameter("usuario", jugador.getUsuario())
-            .getResultList();
-            
-            if (results.size() > 0)
-                jugadorAux = (Jugador)results.get(0);
-            
-            if (jugadorAux != null)
-            {
-                if (!jugadorAux.getActivo() && jugadorAux.getPassword().equalsIgnoreCase(jugador.getPassword()))
-                {
-                    jugadorAux.setActivo(true);
-                    em.merge(jugadorAux);
-                    jugador.setIdjugadores(jugadorAux.getIdjugadores());
-                    em.getTransaction().commit();
-                }
-                else
-                {
-                    if (jugadorAux.getPassword().equalsIgnoreCase(jugador.getPassword()))
-                    jugador.setIdjugadores(jugadorAux.getIdjugadores());
-                }
-            }            
-            else
-            {
-                em.persist(jugador);
-                em.getTransaction().commit();
-            }
-            
-           
-        } 
-        finally 
-        {
-            if (em != null)             
-                em.close();           
-            if (ef != null)
-                ef.close();
-           
-        }
-        
-        return jugador.getIdjugadores();
+        super(usuario,password,fechaRegistro);
+        this.estrategia = new Estrategia();
     }
-
-    @Override
-    public boolean modificarJugador(Jugador jugador)
-    {
-        
-        boolean correcto = true;
-        EntityManager em = null;
-        EntityManagerFactory ef =null;
-        try {
-           
-            ef= Persistence.createEntityManagerFactory("WhiteJackPU");
-            em = ef.createEntityManager();
-        
-            em.getTransaction().begin();
-            Jugador d= em.find(Jugador.class, jugador.getIdjugadores(),LockModeType.OPTIMISTIC);
-            
-            if (d!=null)
-            {
-                em.lock(d, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                
-                em.merge(jugador);
-                em.getTransaction().commit();
-                
-            }
-          
-        } 
-        catch (Exception ex) 
-        {
-            correcto = false;
-            String msg = ex.getLocalizedMessage();
-            if (msg == null || msg.length() == 0) 
-            {
-                Integer id = jugador.getIdjugadores();
-                if (mostrarJugador(id) == null) 
-                {
-                    System.out.println("El jugador con id " + id + " no existe.");
-                }
-            }
-           
-        } 
-        finally 
-        {
-            if (em != null) 
-            {
-                em.close();
-            }
-            
-            if (ef!=null) ef.close();
-        }
-        return correcto;
-    }
-
-    @Override
-    public boolean bajaJugador(Integer id)
-    {
-        
-       EntityManager em = null;
-        boolean correcto = true;
-        try {
-            EntityManagerFactory ef = Persistence.createEntityManagerFactory("WhiteJackPU");
-            em = ef.createEntityManager();
-            em.getTransaction().begin();
-            Jugador persistentJugador = em.find(Jugador.class, id);
-            
-            persistentJugador.setActivo(false); 
-            em.merge(persistentJugador);
-            em.getTransaction().commit();
-        } 
-        catch (Exception ex) 
-        {
-            correcto = false;
-            ex.printStackTrace();
-            
-        } finally {
-            if (em != null) {
-                em.close();
-            }
-        }
-        return correcto;
-    }
-
-    @Override
-    public Jugador mostrarJugador(Integer id) 
-    {
-        EntityManager em = null;
-        EntityManagerFactory ef = null;
-        
-        ef = Persistence.createEntityManagerFactory("WhiteJackPU");
-        em = ef.createEntityManager();
-        
-        Jugador jugador = null;
-        try 
-        {
-            jugador = em.find(Jugador.class, id);
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-        finally 
-        {
-            if (em != null) 
-            {
-                em.close();
-            }
-            
-            if (ef != null)
-            {
-                ef.close();
-            }
-        }
-        
-        return jugador;
-    }
-
     
-    @Override
+
     public void setEstrategia(Estrategia estrategia)
     {
         this.estrategia = estrategia;
     }
      
     
-    @Override
+
     public ArrayList<Carta> getCartas(int nSplit) 
     {
         return this.cartas.get(nSplit);
     }
     
-    @Override
+
     public ArrayList<Carta> getCartas()
     {
         ArrayList<Carta> lista = new ArrayList<Carta>();
@@ -257,11 +75,7 @@ public class SAJugadorImp implements SAJugador
         return lista;
     }
 
-    @Override
-    public int getIDJugador() 
-    {
-        return 1;
-    }
+   
 
     @Override
     public int apostar(int apuestaMin, int apuestaMax) 
@@ -313,7 +127,16 @@ public class SAJugadorImp implements SAJugador
         this.estrategia.contarCartas(cartasEnMesa);
     }
     
+    /*
+    public static void main(String [] args)
+    {
+        // Probemos si da de alta un jugador.
+        SAJugador jugador = new SAJugadorImp("hola","hola3",null);
+        System.out.println(jugador.getIdjugadores());
     
+    }
+    */
+    /*
     public static void main(String [] args)
     {
         SAJugadorImp sa = new SAJugadorImp();
@@ -366,4 +189,5 @@ public class SAJugadorImp implements SAJugador
             System.out.println(str);
         }
     }
+    */
 }

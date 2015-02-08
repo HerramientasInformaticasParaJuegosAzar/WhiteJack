@@ -427,7 +427,7 @@ public class Mesa extends Observable {
                     if (valorManoJugador == 21) {
                         darDineroJugadorPrincipal(2.5);
                     } else if (valorManoDealer <= valorManoJugador && valorManoJugador <21) {
-                        darDineroJugadorPrincipal(2.5);
+                        darDineroJugadorPrincipal(2);
                     } else {
                         darDineroJugadorPrincipal( 0);
                     }

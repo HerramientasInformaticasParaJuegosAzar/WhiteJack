@@ -18,6 +18,7 @@ package casinoblackjack.negocio.juego;
 
 import casinoblackjack.negocio.jugador.estrategias.imp.Viktor;
 import casinoblackjack.negocio.jugador.estrategias.Estrategia;
+import casinoblackjack.negocio.jugador.estrategias.imp.HL;
 import casinoblackjack.negocio.jugador.estrategias.imp.Ivan;
 import casinoblackjack.negocio.mesa.Mesa;
 import casinoblackjack.negocio.mesa.ui.MainWindow;
@@ -47,6 +48,7 @@ public class Juego{
 		ArrayList<Estrategia> e = new ArrayList<>();
 		e.add(new Viktor());
                 e.add(new Ivan());
+                e.add(new HL());
 		return e;
 	}
 

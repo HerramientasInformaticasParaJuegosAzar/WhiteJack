@@ -11,13 +11,10 @@ import casinoblackjack.negocio.cartas.barajeador.Barajeador;
 import casinoblackjack.negocio.cuentas.SA.SABanca;
 import casinoblackjack.negocio.cuentas.SA.imp.SABancaImp;
 import casinoblackjack.negocio.dealer.Dealer;
-import casinoblackjack.negocio.jugador.Jugador;
+import casinoblackjack.negocio.factoriaSA.FactoriaSA;
 import casinoblackjack.negocio.jugador.SA.SAJugador;
-import casinoblackjack.negocio.jugador.SA.imp.SAJugadorImp;
-import casinoblackjack.negocio.jugador.estrategias.Estrategia;
 import casinoblackjack.negocio.mesa.obs.Observable;
 import casinoblackjack.negocio.mesa.ui.MainWindow;
-import casinoblackjack.negocio.turno.Turnos;
 
 import java.util.ArrayList;
 
@@ -40,7 +37,7 @@ public class Mesa extends Observable {
     
     private Barajeador baraja;
 
-    private Turnos turno;
+    private int turno;
 
     private ArrayList<Carta> cartasQuemadas = new ArrayList<>();
 
@@ -54,7 +51,7 @@ public class Mesa extends Observable {
 
     public Mesa(int barajas) {
     	this.numBarajas = barajas;
-        this.dealer = new Dealer();
+        this.dealer = new Dealer("dealer","dealer1",null);
         this.baraja = new Barajeador(barajas);
         this.baraja.barajear();
         this.apuestaMin = 1;
@@ -65,7 +62,7 @@ public class Mesa extends Observable {
     }
     
     public Mesa(int barajas, int apuestaMin, int apuestaMax) {
-        this.dealer = new Dealer();
+        this.dealer = new Dealer("dealer","dealer1",null);
         this.baraja = new Barajeador(barajas);
         this.apuestaMin = apuestaMin;
         this.apuestaMax = apuestaMax;
@@ -75,12 +72,16 @@ public class Mesa extends Observable {
     	return this.uiActiva;
     }
     
-	public void setPlayers(ArrayList<SAJugador> jugadores2) {
-		this.jugadores = jugadores2;
-		for(int i = 0 ; i< jugadores.size();i++){
-			this.apuestas.add(0);	
-		}
+    public void setPlayers(ArrayList<SAJugador> jugadores2) 
+    {
+	this.jugadores = jugadores2;
+	
+        for(int i = 0 ; i< jugadores.size();i++)
+        {
+            this.apuestas.add(0);	
 	}
+    }
+    
     public void addMainPlayer(SAJugador jugadorprincipal, boolean isUIActive) {
     	this.uiActiva = isUIActive;
         this.jugadorPrincipal= jugadorprincipal;
@@ -116,21 +117,21 @@ public class Mesa extends Observable {
      *   Pregunta a la banca si el jugador tiene suficiente dinero en alguna de sus cuentas:
      *       para ello le pregunta a la banca por sus cuentas 
      *       y luego comprueba si con alguna de ellas puede apostar.
+            y devuelve el id de la cuenta con la que puede apostar
      */
-    private boolean puedeApostar(SAJugador jugador, int posibleApuesta) {
-        return true;/*
-        int indexJugador = this.jugadores.indexOf((SAJugador) jugador);
-        Jugador aux  = new Jugador();
-        aux.setIdjugadores(jugador.getIDJugador());
-        ArrayList<Integer> cuentas = banca.obtenerCuentasJugador(aux);
-        for (Integer numCuenta : cuentas) {
-            //this.banca.consultarSaldoCuenta(numCuenta)
-            if (this.banca.consultarSaldoCuenta(1) >= posibleApuesta) {
-                this.apuestas.set(indexJugador, posibleApuesta * 2);
-                return true;
-            }
-        }
-        return false;*/
+    private int puedeApostar(SAJugador jugador, int posibleApuesta) 
+    {
+        int idCuentaParaApostar = -1;
+        
+        ArrayList<Integer> cuentas = banca.obtenerCuentasJugador(jugador.getIdjugadores());
+        
+        for (Integer cuenta : cuentas) 
+            if (FactoriaSA.getInstancia().obtenerSABanca().consultarSaldoCuenta(cuenta) - posibleApuesta >= 0) 
+                idCuentaParaApostar = cuenta;
+            
+        
+        
+        return idCuentaParaApostar;
     }
 
     /*   puedeApostar(SAJugador jugador)
@@ -166,10 +167,13 @@ public class Mesa extends Observable {
      */
     private void recogerApuestas() {
         int posibleApuesta;
-        if (jugadores != null) {
-            for (int i = 0; i < jugadores.size(); i++) {
+        if (jugadores != null) 
+        {
+            for (int i = 0; i < jugadores.size(); i++) 
+            {
                 posibleApuesta = this.jugadores.get(i).apostar(this.apuestaMin, this.apuestaMax);
-                if (puedeApostar(this.jugadores.get(i), posibleApuesta)) {
+                if (puedeApostar(this.jugadores.get(i), posibleApuesta) >= 0) 
+                {
                     this.apuestas.set(i, posibleApuesta);
                     log("El jugador "+i+" ha realizado una apuesta de "+posibleApuesta);
                 } else /*
@@ -181,7 +185,9 @@ public class Mesa extends Observable {
 
             }
             posibleApuesta = this.jugadorPrincipal.apostar(apuestaMin, apuestaMax);
-            if (puedeApostar(this.jugadorPrincipal, posibleApuesta)) {
+            
+            if (puedeApostar(this.jugadorPrincipal, posibleApuesta) >= 0) 
+            {
                 apuestaJugadorPrincipal = posibleApuesta;
                 log("El jugador principal ha realizado una apuesta de "+posibleApuesta);
             }
@@ -194,7 +200,8 @@ public class Mesa extends Observable {
      *
      *   Pregunta a cada jugador por una decisión siempre que haya apostado algo.
      */
-    private void preguntarDecisiones() {
+    private void preguntarDecisiones() 
+    {
         for (int i = 0; i < jugadores.size(); i++) {
             if (this.apuestas.get(i) > 0) {
             	log("---Turno de decidir del jugador "+i+"---");
@@ -401,10 +408,10 @@ public class Mesa extends Observable {
      */
     private void darDinero(SAJugador jugador, double multiplicador) {
         if (multiplicador == 0) {
-        	log("Un jugador ha perdido contra el dealer");
+        	log("El jugador "+jugador.getIdjugadores()+" ha perdido contra el dealer");
             apuestas.set(jugadores.indexOf(jugador), 0);
         } else {
-        	log("Un jugador ha ganado esta partida");
+        	log("El jugador "+jugador.getIdjugadores()+" ha ganado esta partida");
             int indexJugador = this.jugadores.indexOf((SAJugador) jugador);
             //banca.incrementarSaldo(1, 1);
         }

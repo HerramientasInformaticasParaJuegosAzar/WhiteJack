@@ -17,6 +17,7 @@
 package casinoblackjack.negocio.mesa.ui;
 
 import casinoblackjack.negocio.cartas.Carta;
+import casinoblackjack.negocio.factoriaSA.FactoriaSA;
 import casinoblackjack.negocio.jugador.SA.SAJugador;
 import casinoblackjack.negocio.jugador.SA.imp.SAJugadorImp;
 import casinoblackjack.negocio.jugador.estrategias.Estrategia;
@@ -442,12 +443,20 @@ public class MainWindow extends Thread implements Observador {
 		new Simulacion(mesa, progressBar, numSimulaciones).start();
 	}
 
-	protected void establecerJugadores() {
+	protected void establecerJugadores() 
+        {
 		// TODO Auto-generated method stub
 		int numJugadores = (int) spinnerJugadores.getValue();
 		ArrayList<SAJugador> jugadores = new ArrayList<>();
-		for (int i = 0; i <numJugadores ; i++) {
-			jugadores.add(new SAJugadorImp());
+                SAJugador jugadorActual;
+		for (int i = 0; i <numJugadores ; i++) 
+                {
+                    jugadorActual = new SAJugadorImp("jugador"+i,"jugadorP"+i,null);
+                    // Si el jugador Actual automatico no tiene ninguna cuenta, le creamos una por defecto.
+                    if (FactoriaSA.getInstancia().obtenerSABanca().obtenerCuentasJugador(jugadorActual.getIdjugadores()).isEmpty())
+                        FactoriaSA.getInstancia().obtenerSABanca().altaCuenta(jugadorActual.getIdjugadores(), 500); // Damos de alta una cuenta por defecto con 500 euros.
+		
+                    jugadores.add(new SAJugadorImp("jugador"+i,"jugadorP"+i,null));
 		}
 		this.mesa.setPlayers(jugadores);
 	}
@@ -533,13 +542,13 @@ public class MainWindow extends Thread implements Observador {
 	}
 
 	private void addEstrategia() {
-		SAJugadorImp jugador = new SAJugadorImp((Estrategia) comboBoxJugada.getModel().getSelectedItem());
+		SAJugadorImp jugador = new SAJugadorImp("jugadorPrincipal","jugadorPrincipalP",null,(Estrategia) comboBoxJugada.getModel().getSelectedItem());
 		this.mesa.addMainPlayer(jugador, false);
 	}
 	
 	private void addJugadorUI() {
 		if(!mesa.isUIPlayer()){
-			JugadorUI jugador = new JugadorUI((Estrategia) comboBoxJugada.getModel().getSelectedItem());
+			JugadorUI jugador = new JugadorUI("jugadorUI","JugadorUIP",null,(Estrategia) comboBoxJugada.getModel().getSelectedItem());
 			this.mesa.addMainPlayer(jugador, true);
 		}
 	}

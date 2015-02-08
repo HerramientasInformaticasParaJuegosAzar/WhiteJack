@@ -22,6 +22,6 @@ package casinoblackjack.negocio.turno;
  */
 public interface SATurno 
 {
-    public int altaTurno(int idJugador, double resultado);
-    public int obtenerUltimoTurno(); 
+    public boolean altaTurno(int idTurno,int idJugador,  double resultado);
+    public int obtenerSiguienteTurno(); 
 }

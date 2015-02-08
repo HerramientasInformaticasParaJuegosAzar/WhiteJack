@@ -5,144 +5,88 @@
  */
 package casinoblackjack.negocio.cuentas.SA.imp;
 
-import casinoblackjack.negocio.EntityFactory.EntityFactorySingleton;
+import casinoblackjack.negocio.Conexion.Conexion;
 import casinoblackjack.negocio.cuentas.Cuenta;
 import casinoblackjack.negocio.cuentas.SA.SABanca;
-import casinoblackjack.negocio.jugador.Jugador;
-import casinoblackjack.negocio.jugador.SA.imp.SAJugadorImp;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
 
-/**
- *
- * @author Krnx
- */
+
 public class SABancaImp implements SABanca
 {
 
     @Override
-    public int altaCuenta(Cuenta cuenta) 
+    public boolean altaCuenta(int idJugador, double dinero) 
     {
-        cuenta.setIdcuentas(-1);
+        boolean correcto = true;
         
-        EntityManager em = null;
-        EntityManagerFactory ef = null;
-        try 
+        Connection conexion = Conexion.getInstancia();
+        
+        try
         {
-            ef = Persistence.createEntityManagerFactory("WhiteJackPU");
-            em = ef.createEntityManager();
-            
-            em.getTransaction().begin();
-            
-            Cuenta cuentaAux = null;
-            
-            List results = em.createNamedQuery("Cuenta.findByIdcuentas")
-            .setParameter("idcuentas", cuenta.getIdcuentas())
-            .getResultList();
-            
-            if (results.size() > 0)
-                cuentaAux = (Cuenta)results.get(0);
-            
-            if (cuentaAux != null)
+            Statement st = conexion.createStatement();
+        
+            ResultSet rs = st.executeQuery("SELECT * FROM jugadores WHERE idJugadores = '" + idJugador+"'");
+        
+            // Si existe el jugador
+            if (rs.next())
             {
-                if (!cuentaAux.getActiva())
+                // Si el jugador esta activo se le crea la cuenta.
+                if (rs.getBoolean("activo"))
                 {
-                    cuentaAux.setActiva(true);
-                    em.merge(cuentaAux);
-                    cuenta.setIdcuentas(cuentaAux.getIdcuentas());
-                    em.getTransaction().commit();
+                    st.executeUpdate("INSERT INTO cuentas(jugador,saldo) VALUES ('"+idJugador+"','"+dinero+"')");
+                    
                 }
                 else
                 {
-                    System.out.println("Ya existe la cuenta");
-                    em.getTransaction().rollback();
+                    correcto = false;
+                    System.err.println("El jugador no esta activo y no se le puede crear una cuenta.");
                 }
-            }            
-            else
-            {
-                em.persist(cuenta);
-                em.getTransaction().commit();
+                
             }
-            
-           
-        } 
-        finally 
+        }
+        catch(Exception e)
         {
-            if (em != null)             
-                em.close();           
-            if (ef != null)
-                ef.close();
+           e.printStackTrace();
         }
         
-        return cuenta.getIdcuentas();
+        
+        return correcto;
+    
     }
 
     @Override
     public double consultarSaldoCuenta(int idCuenta) 
     {
         double saldo = 0;
-        EntityManager em = null;
-        EntityManagerFactory ef = null;
-        try 
-        {
-            ef= Persistence.createEntityManagerFactory("WhiteJackPU");
-            em = ef.createEntityManager();
-            Cuenta c = em.find(Cuenta.class, idCuenta);
-            saldo = c.getSaldo();
-        }
-        catch (Exception ex) 
-        {
-            String msg = ex.getLocalizedMessage();
-            if (msg == null || msg.length() == 0) 
-            {    
-                System.out.println("La cuenta con id " + idCuenta + " no existe.");      
-            }
-           
-        } 
-        finally 
-        {
-            if (em != null) 
-            {
-                em.close();
-            }
-            
-            if (ef!=null) ef.close();
-        }
-        return saldo;
-    }
-
-    @Override
-    public double consultarSaldoCuentas(int idJugador) 
-    {
-        double saldo = 0;
         
-        EntityManager em = null;
-        EntityManagerFactory ef = null;
-        try 
+        Connection conexion = Conexion.getInstancia();
+        
+        try
         {
-            ef = Persistence.createEntityManagerFactory("WhiteJackPU");
-            em = ef.createEntityManager();
-            
-            em.getTransaction().begin();
-            
-           Query sumQuery = em.createQuery("SELECT SUM(saldo) FROM cuentas WHERE jugador = "+idJugador);
-            
-           saldo = (double)sumQuery.getSingleResult();
-           
-           
-        } 
-        finally 
-        {
-            if (em != null)             
-                em.close();           
-            if (ef != null)
-                ef.close();
+            Statement st = conexion.createStatement();
+        
+            ResultSet rs = st.executeQuery("SELECT * FROM cuentas WHERE idcuentas = '" + idCuenta +"'");
+        
+            // Si existe la cuenta
+            if (rs.next())
+            {
+                // Obtenemos el saldo   
+                saldo = rs.getDouble("saldo");            
+            }
+            else
+            {  
+                System.err.println("La cuenta no existe");
+            }
+        
         }
+        catch(Exception e)
+        {
+           e.printStackTrace();
+        }
+        
         
         return saldo;
     }
@@ -150,173 +94,134 @@ public class SABancaImp implements SABanca
     @Override
     public boolean incrementarSaldo(int idCuenta, double incremento) 
     {
-        EntityManager em = null;
-        boolean correcto = false;
+        boolean correcto = true;
         
-        try 
+        Connection conexion = Conexion.getInstancia();
+        
+        try
         {
-            EntityManagerFactory ef = Persistence.createEntityManagerFactory("WhiteJackPU");
-            em = ef.createEntityManager();
-            em.getTransaction().begin();
-            Cuenta persistentCuenta = em.find(Cuenta.class, idCuenta);
+            Statement st = conexion.createStatement();
+        
+            ResultSet rs = st.executeQuery("SELECT * FROM cuentas WHERE idCuentas = '" + idCuenta +"'");
+        
             
-           
-            
-            if (persistentCuenta != null)
+            // Si existe la cuenta y esta activa
+            if (rs.next() && rs.getBoolean("activa"))
             {
-                persistentCuenta.setSaldo(persistentCuenta.getSaldo() + incremento);
-                em.merge(persistentCuenta);
-                em.getTransaction().commit();
-                correcto = true;
+                
+                incremento += rs.getDouble("saldo");
+                st.executeUpdate("UPDATE cuentas SET saldo = " + incremento);          
             }
             else
             {
-                System.out.println("No existe la cuenta");
-                em.getTransaction().rollback();
+                correcto = false;
+                System.err.println("La cuenta no existe o no esta activa.");
             }
-        } 
-        catch (Exception ex) 
-        {
-            correcto = false;
-            ex.printStackTrace();
-            
-        } finally {
-            if (em != null) {
-                em.close();
-            }
+        
         }
+        catch(Exception e)
+        {
+           e.printStackTrace();
+        }
+        
         return correcto;
     }
 
     @Override
     public boolean decrementarSaldo(int idCuenta, double decremento) 
     {
-        EntityManager em = null;
-        boolean correcto = false;
+        boolean correcto = true;
         
-        try 
+        Connection conexion = Conexion.getInstancia();
+        
+        try
         {
-            EntityManagerFactory ef = Persistence.createEntityManagerFactory("WhiteJackPU");
-            em = ef.createEntityManager();
-            em.getTransaction().begin();
-            Cuenta persistentCuenta = em.find(Cuenta.class, idCuenta);
+            Statement st = conexion.createStatement();
+        
+            ResultSet rs = st.executeQuery("SELECT * FROM cuentas WHERE idCuentas = '" + idCuenta +"'");
+        
             
-           
-            
-            if (persistentCuenta != null && persistentCuenta.getSaldo() - decremento >= 0)
+            // Si existe la cuenta
+            if (rs.next() && rs.getBoolean("activa") &&(rs.getDouble("saldo") - decremento >= 0))
             {
-                persistentCuenta.setSaldo(persistentCuenta.getSaldo() - decremento);
-                em.merge(persistentCuenta);
-                em.getTransaction().commit();
-                correcto = true;
+                decremento = rs.getDouble("saldo") - decremento;
+                
+                st.executeUpdate("UPDATE cuentas SET saldo = " + decremento);          
             }
             else
             {
-                System.out.println("No existe la cuenta o no se puede retirar dicha apuesta");
-                em.getTransaction().rollback();
+                correcto = false;
+                System.err.println("La cuenta no existe o no esta activa o no tienes saldo suficiente para ejecutar esta accion.");
             }
-        } 
-        catch (Exception ex) 
-        {
-            correcto = false;
-            ex.printStackTrace();
-            
-        } finally {
-            if (em != null) {
-                em.close();
-            }
+        
         }
+        catch(Exception e)
+        {
+           e.printStackTrace();
+        }
+        
         return correcto;
     }
 
-    @Override
-    public boolean bajaCuenta(int idCuenta) 
-    {
-        EntityManager em = null;
-        boolean correcto = false;
-        
-        try 
-        {
-            EntityManagerFactory ef = Persistence.createEntityManagerFactory("WhiteJackPU");
-            em = ef.createEntityManager();
-            em.getTransaction().begin();
-            Cuenta persistentCuenta = em.find(Cuenta.class, idCuenta);
-            
-           
-            
-            if (persistentCuenta != null)
-            {
-                persistentCuenta.setActiva(false);
-                em.merge(persistentCuenta);
-                em.getTransaction().commit();
-                correcto = true;
-            }
-            else
-            {
-                System.out.println("No existe la cuenta");
-                em.getTransaction().rollback();
-            }
-        } 
-        catch (Exception ex) 
-        {
-            correcto = false;
-            ex.printStackTrace();
-            
-        } finally {
-            if (em != null) {
-                em.close();
-            }
-        }
-        return correcto;
-    }
     
-    public ArrayList<Integer> obtenerCuentasJugador(Jugador jugador)
+    public ArrayList<Integer> obtenerCuentasJugador(int idJugador)
     {
         ArrayList<Integer> cuentasDelJugador = new ArrayList<>();
         
-        EntityManager em = null;
-        EntityManagerFactory ef = null;
-        try 
+        Connection conexion = Conexion.getInstancia();
+        
+        try
         {
-            ef = Persistence.createEntityManagerFactory("WhiteJackPU");
-            em = ef.createEntityManager();
-            
-            em.getTransaction().begin();
-            
-            Cuenta cuentaAux = null;
-            
-            List results = em.createNamedQuery("Cuenta.obtenerCuentasJugador")
-            .setParameter("jugador", jugador)
-            .getResultList();
-            
-            if (results.size() > 0)
-                cuentasDelJugador.add((Integer)results.get(0));
-            
-           
-           
-        } 
-        finally 
+            Statement st = conexion.createStatement();
+        
+            ResultSet rs = st.executeQuery("SELECT * FROM cuentas WHERE jugador = '" + idJugador + "'");
+        
+            // Mientras el jugador tiene cuentas asociadas.
+            while (rs.next())
+            {
+                // Si la cuenta esta activa
+                if (rs.getBoolean("activa"))
+                {
+                    cuentasDelJugador.add(rs.getInt("idCuentas"));
+                }
+        
+            }
+        }
+        catch(Exception e)
         {
-            if (em != null)             
-                em.close();           
-            if (ef != null)
-                ef.close();
+           e.printStackTrace();
         }
         
         return cuentasDelJugador;
     }
-
+    /*
+     public static void main(String args[])
+    {
+        Cuenta a = new Cuenta(20);
+        SABanca b = new SABancaImp();
+        
+        b.altaCuenta(5, 500);
+        ArrayList<Integer> cuentas = b.obtenerCuentasJugador(5);
+        for(int i = 0; i < cuentas.size();i++)
+        {
+            System.out.println("La cuenta "+cuentas.get(i)+" tiene " + b.consultarSaldoCuenta(cuentas.get(i)) + " de saldo.");
+        }
+        b.incrementarSaldo(cuentas.get(0), 25);
+        b.decrementarSaldo(cuentas.get(0), 20);
+    }
+    */
+    /*
     public static void main(String args[])
     {
         SABancaImp sa = new SABancaImp();
         SAJugadorImp saJ = new SAJugadorImp();
         Cuenta a = new Cuenta();
         
-        /*
+        
         a.setJugador(saJ.mostrarJugador(1));
         a.setSaldo(500);
         sa.altaCuenta(a);
-                */
+                
         
         Jugador jugador = new Jugador();
         jugador.setUsuario("hooo84");
@@ -332,4 +237,5 @@ public class SABancaImp implements SABanca
         for (int i = 0; i < b.size();i++)
             System.out.println(b.get(i));
     }
+    */
 }

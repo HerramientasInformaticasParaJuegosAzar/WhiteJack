@@ -380,7 +380,8 @@ public class Mesa extends Observable {
     private void ganaDealer() {
     	log("El dealer gana con blackjack");
         for (int i = 0; i < apuestas.size(); i++) {
-            if (calcularValor(jugadorPrincipal, i) ==21) {
+            for(int j = 0; j < jugadores.get(i).numSplits())
+            if (calcularValor(jugadores.get(i), j) ==21) {
             	log("El jugador "+i+" hace empata con el dealer");
                 darDinero(jugadores.get(i), 1);
                 

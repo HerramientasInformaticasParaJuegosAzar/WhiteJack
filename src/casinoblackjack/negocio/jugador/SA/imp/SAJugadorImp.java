@@ -104,7 +104,8 @@ public class SAJugadorImp extends SAJugador
     @Override
     public void split(int nSplit) 
     {
-        Carta carta = this.cartas.get(nSplit).remove(1);
+        Carta carta = this.cartas.get(nSplit).get(1);
+        this.cartas.get(nSplit).remove(1);
         addCarta(carta, this.cartas.size());
     }
 

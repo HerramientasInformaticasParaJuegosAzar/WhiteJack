@@ -467,7 +467,7 @@ public class Mesa extends Observable {
                 darDinero(jugadorPrincipal, 1);
                 
             } else {
-                apuestaJugadorPrincipal = 0;
+                darDineroJugadorPrincipal( 0);
             }
             actualizarCartas();
         }

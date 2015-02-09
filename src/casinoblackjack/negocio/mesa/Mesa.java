@@ -402,7 +402,7 @@ public class Mesa extends Observable {
      */
     private void decidirGanador() {
         int valorManoDealer = this.calcularValor(dealer, 0);
-        if (valorManoDealer == 21) {
+        if (valorManoDealer == 21 && dealer.getCartas().size() ==2) {
             ganaDealer();
         } else {
             int valorManoJugador;
@@ -410,26 +410,34 @@ public class Mesa extends Observable {
             {
                 for(int i = 0; i < jugador.numSplits(); i++)
                 {
-                    valorManoJugador = calcularValor(jugador, 0);
-                    if (valorManoJugador == 21) {
-                        darDinero(jugador, 2.5);
-                    } else if (valorManoDealer >= valorManoJugador) {
-                        darDinero(jugador, 2.5);
-                    } else {
-                        darDinero(jugador, 0);
+                    valorManoJugador = calcularValor(jugador, i);
+                      if (valorManoJugador == 21 && jugador.getCartas().size() ==2) {
+                        darDinero(jugador,2.5);
+                    } else if (valorManoJugador <= 21 && valorManoDealer > 21) {
+                        darDinero(jugador,2);
+                    } else if (valorManoJugador <= 21 && valorManoDealer < 21 && valorManoJugador > valorManoDealer){
+                        darDinero( jugador,2);
+                    }else if (valorManoJugador <= 21 && valorManoDealer < 21 && valorManoJugador == valorManoDealer){
+                         darDinero(jugador, 1);
+                    }else {
+                         darDinero( jugador,0);
                     }
                 }
             }
             
             for(int i = 0; i < jugadorPrincipal.numSplits(); i++)
             {
-                valorManoJugador = calcularValor(jugadorPrincipal, 0);
-                    if (valorManoJugador == 21) {
+                valorManoJugador = calcularValor(jugadorPrincipal, i);
+                    if (valorManoJugador == 21 && jugadorPrincipal.getCartas().size() ==2) {
                         darDineroJugadorPrincipal(2.5);
-                    } else if (valorManoDealer <= valorManoJugador && valorManoJugador <21) {
+                    } else if (valorManoJugador <= 21 && valorManoDealer > 21) {
                         darDineroJugadorPrincipal(2);
-                    } else {
-                        darDineroJugadorPrincipal( 0);
+                    } else if (valorManoJugador <= 21 && valorManoDealer < 21 && valorManoJugador > valorManoDealer){
+                        darDineroJugadorPrincipal( 2);
+                    }else if (valorManoJugador <= 21 && valorManoDealer < 21 && valorManoJugador == valorManoDealer){
+                         darDineroJugadorPrincipal( 1);
+                    }else {
+                         darDineroJugadorPrincipal( 0);
                     }
             }
         }
